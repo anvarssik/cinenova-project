@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineNova - Кинотеатр нового поколения</title>
+    <script src="https://kit.fontawesome.com/40b43bf8e6.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/forms.css">
+    <script src="js/ui.js" defer></script>
+    <script src="js/api.js" defer></script>
+    <script src="js/features.js" defer></script>
+    <script src="js/validation.js" defer></script>
+</head>
+
+<body>
+    <header class="header">
+        <button class="burger-menu" id="burgerMenu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="logo-container" id="logoLink">
+            <div class="logo">
+                <img src="img/logofinal.png" alt="CineNova Logo">
+                <span class="beta-badge">Beta</span>
+            </div>
+        </div>
+        <div class="header-menu" id="headerMenu">
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#movies" data-id="movies">Афиша</a></li>
+                    <li><a href="#cinemas" data-id="cinemas">Кинотеатры</a></li>
+                    <li><a href="#company" data-id="company">Найти компанию</a></li>
+                    <li><a href="#collector" data-id="collector">AI Коллекционер</a></li>
+                    <li><a href="#about" data-id="about">О нас</a></li>
+                </ul>
+            </nav>
+            <div class="header-controls">
+                <div class="search-bar">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="search" id="movieSearch" placeholder="Search">
+                </div>
+                <div class="custom-select-container">
+                    <i class="fa-solid fa-location-dot select-icon"></i>
+                    <div class="custom-select" id="citySelect">
+                        <div class="select-selected">Petropavlovsk</div>
+                        <div class="select-items select-hide">
+                            <div>Astana</div>
+                            <div>Karaganda</div>
+                            <div>Almaty</div>
+                            <div>Shymkent</div>
+                            <div>Pavlodar</div>
+                            <div>Kostanay</div>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-chevron-down arrow-icon"></i>
+                </div>
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fa-solid fa-sun"></i>
+                </button>
+                <div class="user-auth">
+                    <button class="btn-signin" id="openAuthModal">Sign In | Register</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="layout-container">
+        <aside class="sidebar-left">
+            <div class="sidebar-sticky-wrapper">
+                <h2 class="sidebar-title">Explore</h2>
+                <section class="find-buddy-widget">
+                    <h3>Find a Movie Buddy</h3>
+                    <div class="users-avatars">
+                        <img src="img/avatar1.png" alt="User 1">
+                        <img src="img/avatar2.png" alt="User 2">
+                        <img src="img/avatar3.png" alt="User 3">
+                    </div>
+                    <a href="#company" class="action-link">View all profiles <i class="fa-solid fa-arrow-right"></i></a>
+                </section>
+                <section class="ai-ticket-widget">
+                    <h3>AI Ticket Creator</h3>
+                    <div class="ai-arts">
+                        <img src="img/ai-art1.png" alt="AI Generated Ticket 1">
+                        <img src="img/ai-art2.png" alt="AI Generated Ticket 2">
+                    </div>
+                    <a href="#collector" class="action-link">Create yours <i class="fa-solid fa-arrow-right"></i></a>
+                </section>
+                <div class="sidebar-footer-info">
+                    <p class="sidebar-footer-title">Подписаться на нас</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="#"><i class="fa-brands fa-facebook-f"></i></a>
+                        <a href="#"><i class="fa-brands fa-whatsapp"></i></a>
+                        <a href="#"><i class="fa-brands fa-tiktok"></i></a>
+                    </div>
+                    <a href="#" class="sidebar-privacy">Конфиденциальность</a>
+                    <p class="sidebar-email">E-mail: info@kinoafisha.info</p>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content" id="modulesContainer">
+            <div id="movies" class="content-section">
+                <section class="hero-banner">
+                    <img src="img/mario-bg.png" alt="Mario Background" class="hero-bg">
+                    <div class="hero-content">
+                        <img src="img/mario-poster-small.png" alt="Mario Poster" class="hero-poster">
+                        <div class="hero-info">
+                            <span class="achievements-badge">5 Achievements</span>
+                            <h1>Супер Марио: Галактическое кино</h1>
+                            <div class="rating">Rating: 6.6/10 <i class="fa-solid fa-star"></i></div>
+                            <button id="buyTicketsBtn" class="btn-primary">Buy Tickets</button>
+                            <div class="tags">
+                                <span>Фэнтези</span>
+                                <span>Семейный</span>
+                                <span>Приключения</span>
+                                <span>Мультфильм</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="current-movies">
+                    <h2>Current Movies</h2>
+                    <div class="movies-and-actions">
+                        <div class="movies-wrapper">
+                            <div class="movies-grid" id="moviesGrid"></div>
+                        </div>
+                        <div class="action-buttons-stack">
+                            <a href="#split-pay-hub" class="action-btn-new nav-trigger" data-id="split-pay-hub">
+                                <i class="fa-solid fa-wallet"></i>
+                                <span>Split-Pay Ready</span>
+                            </a>
+                            <a href="#company" class="action-btn-new nav-trigger" data-id="company">
+                                <i class="fa-solid fa-users"></i>
+                                <span>Company Finder</span>
+                            </a>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="bottom-widgets">
+                    <section class="interactive-map">
+                        <div class="map-header">
+                            <h2>Interactive map of locations</h2>
+                            <span class="status-indicator">Real-time availability</span>
+                        </div>
+                        <p>Map of locations for visitors</p>
+                        <div class="seat-map" id="seatMap"></div>
+                        <button id="mapPayBtn" class="btn-primary w-100 hidden-element">Оплатить выбранные места</button>
+                    </section>
+                    <section class="my-collection-widget">
+                        <h2>My Collection</h2>
+                        <p>Achievements & Cases</p>
+                        <div class="collection-icons">
+                            <img src="img/achivment (1).png" alt="Glasses" id="ach1" class="ach-locked">
+                            <img src="img/achivment (2).png" alt="Camera" id="ach2" class="ach-locked">
+                            <img src="img/achivment (3).png" alt="Hat" id="ach3" class="ach-locked">
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <section id="split-pay-hub" class="content-section toggleable-module module-hidden">
+                <button class="close-module-btn"><i class="fa-solid fa-xmark"></i></button>
+                <hr class="section-divider">
+                <h2>Split-Pay & Checkout</h2>
+                <div class="split-pay-grid">
+                    <div class="info-card split-setup-panel">
+                        <h3><i class="fa-solid fa-share-nodes text-accent"></i> Настройка раздельной оплаты</h3>
+                        <p class="panel-subtitle">Пригласите друзей, чтобы разделить стоимость билетов в реальном времени.</p>
+                        <div class="buddy-selector-group">
+                            <div class="buddy-select-item checked">
+                                <input type="checkbox" id="buddy-1" checked>
+                                <label for="buddy-1">
+                                    <img src="img/avatar1.png" alt="User">
+                                    <div class="buddy-meta">
+                                        <span>Александр</span>
+                                        <small>Готов скинуться</small>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="buddy-select-item checked">
+                                <input type="checkbox" id="buddy-2" checked>
+                                <label for="buddy-2">
+                                    <img src="img/avatar2.png" alt="User">
+                                    <div class="buddy-meta">
+                                        <span>Мария</span>
+                                        <small>Готов скинуться</small>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="buddy-select-item">
+                                <input type="checkbox" id="buddy-3">
+                                <label for="buddy-3">
+                                    <img src="img/avatar3.png" alt="User">
+                                    <div class="buddy-meta">
+                                        <span>Максим</span>
+                                        <small>Не в сети</small>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="split-method">
+                            <span>Способ разделения:</span>
+                            <div class="radio-tabs">
+                                <input type="radio" name="split-type" id="split-equal" checked>
+                                <label for="split-equal">Поровну</label>
+                                <input type="radio" name="split-type" id="split-custom">
+                                <label for="split-custom">Каждый за себя</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="info-card checkout-window">
+                        <div class="receipt-header">
+                            <h3>Ваш чек</h3>
+                            <span class="receipt-id">ID: #88492</span>
+                        </div>
+                        <div class="receipt-body">
+                            <div class="receipt-row">
+                                <span>Фильм:</span>
+                                <strong>Супер Марио (IMAX)</strong>
+                            </div>
+                            <div class="receipt-row">
+                                <span>Билеты:</span>
+                                <span id="checkoutTicketCount">0 шт.</span>
+                            </div>
+                            <hr class="receipt-dash">
+                            <div class="receipt-row">
+                                <span>Общая сумма:</span>
+                                <span id="checkoutTotalSum">0 ₸</span>
+                            </div>
+                            <div class="receipt-row text-accent font-semibold">
+                                <span>Ваша доля (1/3):</span>
+                                <span id="checkoutYourShare">0 ₸</span>
+                            </div>
+                        </div>
+                        <div class="payment-methods">
+                            <label class="pay-option">
+                                <input type="radio" name="payment-vendor" checked>
+                                <span class="pay-box"><i class="fa-solid fa-credit-card"></i> Kaspi.kz</span>
+                            </label>
+                            <label class="pay-option">
+                                <input type="radio" name="payment-vendor">
+                                <span class="pay-box"><i class="fa-solid fa-wallet"></i> Счёт системы</span>
+                            </label>
+                        </div>
+                        <button class="btn-primary w-100 btn-pay" id="finalPayBtn">Оплатить свою долю</button>
+                    </div>
+                </div>
+            </section>
+
+            <div id="cinemas" class="content-section toggleable-module module-hidden">
+                <button class="close-module-btn"><i class="fa-solid fa-xmark"></i></button>
+                <hr class="section-divider">
+                <h2>Our Cinemas</h2>
+                <p class="section-desc">Выберите наиболее удобное место для вашего следующего просмотра фильма.</p>
+                <div class="cards-grid">
+                    <div class="info-card cinema-card">
+                        <div class="cinema-icon"><i class="fa-solid fa-film"></i></div>
+                        <h3>Новый свет</h3>
+                        <p><i class="fa-solid fa-location-dot"></i> ул. Казахстанской правды 71</p>
+                        <div class="tags"><span>IMAX</span><span>Dolby Atmos</span></div>
+                        <a href="#" class="btn-outline">Show Schedule</a>
+                    </div>
+                    <div class="info-card cinema-card">
+                        <div class="cinema-icon"><i class="fa-solid fa-video"></i></div>
+                        <h3>Atlas Cinema</h3>
+                        <p><i class="fa-solid fa-location-dot"></i> ул. Жумабаева 91</p>
+                        <div class="tags"><span>3D</span><span>VIP Seats</span></div>
+                        <a href="#" class="btn-outline">Show Schedule</a>
+                    </div>
+                    <div class="info-card cinema-card">
+                        <div class="cinema-icon"><i class="fa-solid fa-popcorn"></i></div>
+                        <h3>Cinema Park</h3>
+                        <p><i class="fa-solid fa-location-dot"></i> ул. Шокана Уалиханова 56</p>
+                        <div class="tags"><span>4DX</span><span>Comfort</span></div>
+                        <a href="#" class="btn-outline">Show Schedule</a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="company" class="content-section toggleable-module module-hidden">
+                <button class="close-module-btn"><i class="fa-solid fa-xmark"></i></button>
+                <hr class="section-divider">
+                <h2>Find a Movie Buddy</h2>
+                <p class="section-desc">Не хотите идти один? Пообщайтесь с людьми, которые разделяют ваши вкусы в кино.</p>
+                <div class="cards-grid">
+                    <div class="info-card buddy-card">
+                        <div class="buddy-header">
+                            <img src="img/avatar1.png" alt="Alex">
+                            <div>
+                                <h3>Александр, 22</h3>
+                                <span class="match-rate"><i class="fa-solid fa-fire"></i> Совпадение на 95%</span>
+                            </div>
+                        </div>
+                        <p>Wants to see: <strong>Шрек 5</strong></p>
+                        <button class="btn-primary w-100 action-restricted" data-action="invite">Send Invite</button>
+                    </div>
+                    <div class="info-card buddy-card">
+                        <div class="buddy-header">
+                            <img src="img/avatar2.png" alt="Maria">
+                            <div>
+                                <h3>Мария, 20</h3>
+                                <span class="match-rate"><i class="fa-solid fa-fire"></i> Совпадение на 88%</span>
+                            </div>
+                        </div>
+                        <p>Wants to see: <strong>Супер Марио</strong></p>
+                        <button class="btn-primary w-100 action-restricted" data-action="invite">Send Invite</button>
+                    </div>
+                    <div class="info-card buddy-card">
+                        <div class="buddy-header">
+                            <img src="img/avatar3.png" alt="Max">
+                            <div>
+                                <h3>Максим, 25</h3>
+                                <span class="match-rate"><i class="fa-solid fa-fire"></i> Совпадение на 74%</span>
+                            </div>
+                        </div>
+                        <p>Wants to see: <strong>Холоп 3</strong></p>
+                        <button class="btn-primary w-100 action-restricted" data-action="invite">Send Invite</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="collector" class="content-section toggleable-module module-hidden">
+                <button class="close-module-btn"><i class="fa-solid fa-xmark"></i></button>
+                <hr class="section-divider">
+                <h2>AI Collector & Cases</h2>
+                <p class="section-desc">Превратите свои билеты в кино в уникальные произведения искусства, созданные с помощью искусственного интеллекта. Собирайте и открывайте специальные кейсы.</p>
+                <div class="ai-gallery">
+                    <div class="ai-item">
+                        <img src="img/ai-art1.png" alt="Ticket Art 1">
+                        <div class="ai-item-overlay">Легендарный билет</div>
+                    </div>
+                    <div class="ai-item">
+                        <img src="img/ai-art2.png" alt="Ticket Art 2">
+                        <div class="ai-item-overlay">Эпический билет</div>
+                    </div>
+                    <div class="ai-item case-unlock action-restricted" data-action="create">
+                        <i class="fa-solid fa-box-open"></i>
+                        <p>Создать больше</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="about" class="content-section toggleable-module module-hidden">
+                <button class="close-module-btn"><i class="fa-solid fa-xmark"></i></button>
+                <hr class="section-divider">
+                <div class="dual-layout">
+                    <div class="about-block">
+                        <h2>About Us</h2>
+                        <p class="section-desc">CineNova - это больше, чем просто кинотеатр. Мы интегрируем искусственный интеллект, чтобы персонализировать ваш опыт - от поиска идеального фильма до создания уникальных коллекционных произведений искусства для ваших просмотренных фильмов.</p>
+                        <ul class="feature-list">
+                            <li><i class="fa-solid fa-check"></i> Next-Gen AI recommendations</li>
+                            <li><i class="fa-solid fa-check"></i> Split-pay система раздельной оплаты для друзей</li>
+                            <li><i class="fa-solid fa-check"></i> Интерактивная карта бронирования</li>
+                        </ul>
+                    </div>
+                    <div id="contact" class="contact-block info-card">
+                        <div class="contact-header-alert">
+                            <h2>Contact Us</h2>
+                            <span class="required-badge"><i class="fa-solid fa-asterisk"></i> Это обязательные поля</span>
+                        </div>
+                        <form id="contactForm" novalidate>
+                            <div class="input-wrapper">
+                                <input type="text" id="contactName" placeholder="Ваше Имя" required>
+                                <span class="error-text"></span>
+                            </div>
+                            <div class="input-wrapper">
+                                <input type="email" id="contactEmail" placeholder="Ваш Email" required>
+                                <span class="error-text"></span>
+                            </div>
+                            <div class="input-wrapper">
+                                <input type="tel" id="contactPhone" placeholder="Номер телефона" required>
+                                <span class="error-text"></span>
+                            </div>
+                            <div class="input-wrapper">
+                                <textarea id="contactMessage" rows="4" placeholder="Как мы можем помочь?" required></textarea>
+                                <span class="error-text"></span>
+                            </div>
+                            <button type="submit" class="btn-primary w-100">Отправить сообщение</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="kinoafisha-footer">
+        <div class="footer-newsletter">
+            <div class="newsletter-text">
+                <h3>Узнавайте о премьерах первыми!</h3>
+                <p>Подпишитесь на нашу рассылку, чтобы получать эксклюзивные предложения и новости кино.</p>
+            </div>
+            <form id="newsletterForm" novalidate>
+                <div class="input-wrapper newsletter-input-wrapper">
+                    <input type="email" id="newsletterEmail" placeholder="Ваш Email адрес" required>
+                    <span class="error-text"></span>
+                </div>
+                <button type="submit" class="btn-primary">Подписаться</button>
+            </form>
+        </div>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Афиша</h4>
+                <ul>
+                    <li><a href="#">В прокате</a></li>
+                    <li><a href="#cinemas">Кинотеатры</a></li>
+                    <li><a href="#movies">Премьеры</a></li>
+                    <li><a href="#">Рецензии</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Что посмотреть</h4>
+                <ul>
+                    <li><a href="#">Подборки</a></li>
+                    <li><a href="#">Премьеры</a></li>
+                    <li><a href="#">Рейтинги</a></li>
+                    <li><a href="#">Трейлеры</a></li>
+                    <li><a href="#">Сериалы</a></li>
+                    <li><a href="#">График выхода</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Медиа</h4>
+                <ul>
+                    <li><a href="#">Новости</a></li>
+                    <li><a href="#">Трейлеры</a></li>
+                    <li><a href="#">Рецензии</a></li>
+                    <li><a href="#">Персоны</a></li>
+                    <li><a href="#" class="action-restricted" data-action="cases">Cases</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Мое</h4>
+                <ul>
+                    <li><a href="#">Билеты</a></li>
+                    <li><a href="#">Избранное</a></li>
+                    <li><a href="#">Расписание</a></li>
+                    <li><a href="#">Оценки</a></li>
+                    <li><a href="#">Отзывы</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="apps">
+                <p>Скачать приложение</p>
+                <a href="#">Google Play</a>
+                <a href="#">App Store</a>
+            </div>
+            <div class="projects">
+                <p>Наши проекты:</p>
+                <a href="#">www.kinoafisha.info</a>
+                <a href="#">Все города</a>
+                <a href="#">Киноафиша Петропавловска</a>
+                <a href="#">Прогноз погоды в мире</a>
+                <a href="#">Городовой</a>
+            </div>
+        </div>
+        <div class="copyright">
+            © 2002-2026 Все права и материалы принадлежат «Киноафиша».
+        </div>
+    </footer>
+
+    <div id="cookieBanner" class="cookie-banner hidden-element">
+        <p>На этой веб-странице используются файлы cookie. Продолжив открывать страницы сайта, Вы соглашаетесь с использованием файлов cookie. <a href="#">Узнать больше</a></p>
+        <button id="acceptCookies" class="btn-primary">Подтвердить</button>
+    </div>
+
+    <button id="floatingChatBtn" class="floating-chat-btn"><i class="fa-solid fa-robot"></i></button>
+
+    <aside class="ai-assistant-chat" id="aiChatWindow">
+        <div class="chat-header">
+            <img src="img/ailogo.png" alt="CineAI" class="chat-logo">
+            <h4>CineAI Assistant</h4>
+            <button class="close-chat" id="closeChatBtn"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="chat-messages">
+            <div class="message ai-message">
+                <p><strong>CineAI:</strong> Привет! Могу ли я порекомендовать что-нибудь в зависимости от вашего настроения? Попробуйте "Захватывающее, но не страшное".</p>
+            </div>
+        </div>
+        <div class="chat-input">
+            <form id="chatForm" novalidate>
+                <div class="input-wrapper" style="flex-grow:1; margin-bottom:0;">
+                    <input type="text" id="chatMessageInput" placeholder="Type a message..." required style="background:none; border:none; color:inherit; outline:none; padding:5px;">
+                    <button type="submit" class="send-btn">➤</button>
+                </div>
+            </form>
+        </div>
+    </aside>
+
+    <button id="scrollTopBtn" class="scroll-top-btn"><i class="fa-solid fa-arrow-up"></i></button>
+    <div id="toastContainer" class="toast-container"></div>
+
+    <div class="auth-modal-overlay" id="authModal">
+        <div class="auth-modal-card">
+            <button class="auth-modal-close" id="closeModalBtn">&times;</button>
+            <div class="auth-tabs">
+                <input type="radio" name="auth-tab-choice" id="tab-login" checked class="tab-input-hidden">
+                <input type="radio" name="auth-tab-choice" id="tab-register" class="tab-input-hidden">
+                <div class="auth-tabs-nav">
+                    <label for="tab-login" class="tab-label">Войти</label>
+                    <label for="tab-register" class="tab-label">Регистрация</label>
+                </div>
+                <div class="auth-tabs-content">
+                    <form class="auth-form login-form-wrapper" id="loginForm" novalidate>
+                        <div class="input-wrapper">
+                            <div class="input-group">
+                                <i class="fa-solid fa-envelope"></i>
+                                <input type="email" id="loginEmail" placeholder="Электронная почта" required>
+                            </div>
+                            <span class="error-text"></span>
+                        </div>
+                        <div class="input-wrapper">
+                            <div class="input-group">
+                                <i class="fa-solid fa-lock"></i>
+                                <input type="password" id="loginPassword" placeholder="Пароль" required>
+                            </div>
+                            <span class="error-text"></span>
+                        </div>
+                        <div class="form-sub-actions">
+                            <label class="remember-me"><input type="checkbox"> Запомнить меня</label>
+                            <a href="#" class="forgot-pass">Забыли пароль?</a>
+                        </div>
+                        <button type="submit" class="btn-primary w-100 submit-btn">Войти в профиль</button>
+                    </form>
+
+                    <form class="auth-form register-form-wrapper" id="registerForm" novalidate>
+                        <div class="input-wrapper">
+                            <div class="input-group">
+                                <i class="fa-solid fa-user"></i>
+                                <input type="text" id="regName" placeholder="Логин (от 4 до 15 символов)" required>
+                            </div>
+                            <span class="error-text"></span>
+                        </div>
+                        <div class="input-wrapper">
+                            <div class="input-group">
+                                <i class="fa-solid fa-envelope"></i>
+                                <input type="email" id="regEmail" placeholder="Электронная почта" required>
+                            </div>
+                            <span class="error-text"></span>
+                        </div>
+                        <div class="input-wrapper">
+                            <div class="input-group">
+                                <i class="fa-solid fa-phone"></i>
+                                <input type="tel" id="regPhone" placeholder="Телефон" required>
+                            </div>
+                            <span class="error-text"></span>
+                        </div>
+                        <div class="input-wrapper">
+                            <div class="input-group">
+                                <i class="fa-solid fa-lock"></i>
+                                <input type="password" id="regPassword" placeholder="Пароль (минимум 8 символов)" required>
+                            </div>
+                            <span class="error-text"></span>
+                        </div>
+                        <label class="terms-accept">
+                            <input type="checkbox" id="regTerms" required> Я согласен с условиями использования
+                        </label>
+                        <span class="error-text" id="regTermsError"></span>
+                        <button type="submit" class="btn-primary w-100 submit-btn" style="margin-top: 10px;">Создать аккаунт</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

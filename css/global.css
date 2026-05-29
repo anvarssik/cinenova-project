@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    --bg-body: #0b0f19;
+    --bg-panel: #151a26;
+    --text-main: #ffffff;
+    --text-muted: #8b95a5;
+    --accent: #00e6a8;
+    --font-main: 'Inter', sans-serif;
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --transition-speed: 0.3s ease;
+}
+
+body.light-theme {
+    --bg-body: #f4f6f8;
+    --bg-panel: #ffffff;
+    --text-main: #111827;
+    --text-muted: #6b7280;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-body);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(139, 149, 165, 0.4);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-main);
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    padding: 20px 40px;
+    line-height: 1.5;
+    overflow-x: hidden;
+    transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+a {
+    text-decoration: none;
+    color: var(--text-main);
+    transition: color var(--transition-speed);
+}
+
+a:hover {
+    color: var(--accent);
+}
+
+ul {
+    list-style: none;
+}
+
+button {
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: inherit;
+    transition: all var(--transition-speed);
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border-radius: var(--radius-sm);
+    transition: transform var(--transition-speed);
+}
+
+h1 { font-size: 32px; font-weight: 700; line-height: 1.2; }
+h2 { font-size: 24px; font-weight: 600; margin-bottom: 20px; }
+h3 { font-size: 18px; font-weight: 600; margin-bottom: 15px; }
+p { font-size: 14px; color: var(--text-muted); }
+
+.w-100 { width: 100%; }
+.text-accent { color: var(--accent); }
+.font-semibold { font-weight: 600; }
+.hidden-element { display: none !important; }
