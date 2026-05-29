@@ -94,15 +94,3 @@ p { font-size: 14px; color: var(--text-muted); }
 .text-accent { color: var(--accent); }
 .font-semibold { font-weight: 600; }
 .hidden-element { display: none !important; }
-
-.beta-badge {
-    background-color: var(--accent);
-    color: #0b0f19;
-    font-size: 10px;
-    font-weight: 700;
-    padding: 3px 6px;
-    border-radius: var(--radius-sm);
-    margin-left: 8px;
-    vertical-align: super;
-    text-transform: uppercase;
-}
