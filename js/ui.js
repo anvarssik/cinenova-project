@@ -1,3 +1,11 @@
+window.addEventListener('load', () => {
+    const loader = document.getElementById('pageLoader');
+    if (loader) {
+        loader.classList.add('loader-hidden');
+        setTimeout(() => loader.remove(), 500);
+    }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
     const burgerBtn = document.getElementById('burgerMenu');
     const headerMenu = document.getElementById('headerMenu');
