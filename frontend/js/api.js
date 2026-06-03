@@ -162,3 +162,51 @@ function renderMovies(movies) {
 document.addEventListener('DOMContentLoaded', () => {
     loadPremieres();
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadMovieBuddies();
+});
+
+async function loadMovieBuddies() {
+    try {
+        const response = await fetch('/api/users');
+        const users = await response.json();
+        renderBuddies(users);
+    } catch (error) {
+        console.error("Ошибка при загрузке пользователей с сервера:", error);
+    }
+}
+
+function renderBuddies(users) {
+    const grid = document.querySelector('#company .cards-grid');
+    if (!grid) return;
+
+    grid.innerHTML = '';
+
+    users.forEach(user => {
+        const card = document.createElement('div');
+        card.className = 'info-card buddy-card';
+
+        card.innerHTML = `
+            <div class="buddy-header">
+                <img src="${user.avatar}" alt="${user.name}">
+                <div>
+                    <h3>${user.name}, ${user.age}</h3>
+                    <span class="match-rate"><i class="fa-solid fa-fire"></i> Совпадение на ${user.match}%</span>
+                </div>
+            </div>
+            <p>Wants to see: <strong>${user.wantsToSee}</strong></p>
+            <button class="btn-primary w-100 action-restricted" data-action="invite">Send Invite</button>
+        `;
+
+        const inviteBtn = card.querySelector('button');
+        inviteBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (checkAuthFlow()) {
+                if (window.showToast) window.showToast('Инвайт успешно отправлен!', 'fa-paper-plane');
+            }
+        });
+
+        grid.appendChild(card);
+    });
+}
