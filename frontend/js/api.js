@@ -18,7 +18,7 @@ async function loadPremieres() {
         });
         const data = await response.json();
         if (data.items) {
-            moviesData = data.items.slice(0, 14);
+            moviesData = data.items.slice(0, 30);
             setupControls();
             updateMoviesUI();
         }
