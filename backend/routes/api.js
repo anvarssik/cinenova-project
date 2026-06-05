@@ -10,7 +10,13 @@ router.get('/', (req, res) => {
 });
 
 router.get('/users', userController.getUsers);
-router.get('/movies', movieController.getMovies);
+router.get('/movies', movieController.getMovies); 
+router.get('/movies/:id', movieController.getMovieById);
+
 router.get('/cinemas', cinemaController.getCinemas);
+
+router.use((req, res) => {
+    res.status(404).json({ message: "API маршрут не найден (Ошибка 404)" });
+});
 
 module.exports = router;
