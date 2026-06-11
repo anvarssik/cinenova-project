@@ -10,41 +10,7 @@
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/forms.css">
-    <style>
-        #pageLoader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--bg-body);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.5s ease;
-        }
-
-        .spinner {
-            width: 40px;
-            height: 40px;
-            border: 4px solid rgba(0, 230, 168, 0.3);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        .loader-hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-    </style>
+    <link rel="stylesheet" href="css/style.css">
     <script src="js/ui.js" defer></script>
     <script src="js/api.js" defer></script>
     <script src="js/features.js" defer></script>
@@ -86,6 +52,7 @@
                     <div class="custom-select" id="citySelect">
                         <div class="select-selected">Petropavlovsk</div>
                         <div class="select-items select-hide">
+                            <div>Petropavlovsk</div>
                             <div>Astana</div>
                             <div>Karaganda</div>
                             <div>Almaty</div>
@@ -100,6 +67,9 @@
                     <i class="fa-solid fa-sun"></i>
                 </button>
                 <div class="user-auth">
+                    <button class="btn-outline hidden-element" id="myTicketsBtn"
+                        style="margin-right: 10px; border-radius: 20px;"><i class="fa-solid fa-ticket"></i> Мои
+                        билеты</button>
                     <button class="btn-signin" id="openAuthModal">Sign In | Register</button>
                 </div>
             </div>
@@ -190,16 +160,18 @@
                         </div>
                         <p>Map of locations for visitors</p>
                         <div class="seat-map" id="seatMap"></div>
-                        <button id="mapPayBtn" class="btn-primary w-100 hidden-element">Оплатить выбранные
-                            места</button>
+                        <button id="mapPayBtn" class="btn-primary w-100 hidden-element"
+                            style="margin-top: 20px;">Оплатить выбранные места</button>
                     </section>
                     <section class="my-collection-widget">
                         <h2>My Collection</h2>
                         <p>Achievements & Cases</p>
                         <div class="collection-icons">
-                            <img src="img/achivment (1).png" alt="Glasses" id="ach1" class="ach-locked">
-                            <img src="img/achivment (2).png" alt="Camera" id="ach2" class="ach-locked">
-                            <img src="img/achivment (3).png" alt="Hat" id="ach3" class="ach-locked">
+                            <img src="img/achivment (1).png" alt="First Ticket" id="ach1" class="ach-locked"
+                                title="Первый ряд">
+                            <img src="img/achivment (2).png" alt="Buddy" id="ach2" class="ach-locked"
+                                title="Душа компании">
+                            <img src="img/achivment (3).png" alt="Creator" id="ach3" class="ach-locked" title="Творец">
                         </div>
                     </section>
                 </div>
@@ -260,12 +232,12 @@
                     <div class="info-card checkout-window">
                         <div class="receipt-header">
                             <h3>Ваш чек</h3>
-                            <span class="receipt-id">ID: #88492</span>
+                            <span class="receipt-id" id="receiptIdBox">ID: #00000</span>
                         </div>
                         <div class="receipt-body">
                             <div class="receipt-row">
                                 <span>Фильм:</span>
-                                <strong>Супер Марио (IMAX)</strong>
+                                <strong id="checkoutMovieTitle">Выберите фильм</strong>
                             </div>
                             <div class="receipt-row">
                                 <span>Билеты:</span>
@@ -277,9 +249,14 @@
                                 <span id="checkoutTotalSum">0 ₸</span>
                             </div>
                             <div class="receipt-row text-accent font-semibold">
-                                <span>Ваша доля (1/3):</span>
+                                <span>К оплате:</span>
                                 <span id="checkoutYourShare">0 ₸</span>
                             </div>
+                        </div>
+                        <div style="display:flex; gap:10px; margin-top: 15px;">
+                            <input type="text" id="promoInput" placeholder="Промокод (CINENOVA)"
+                                style="width:100%; padding: 10px; border-radius: 8px; border: 1px solid rgba(139,149,165,0.2); background: transparent; color: inherit;">
+                            <button id="applyPromoBtn" class="btn-outline">Применить</button>
                         </div>
                         <div class="payment-methods">
                             <label class="pay-option">
@@ -291,7 +268,7 @@
                                 <span class="pay-box"><i class="fa-solid fa-wallet"></i> Счёт системы</span>
                             </label>
                         </div>
-                        <button class="btn-primary w-100 btn-pay" id="finalPayBtn">Оплатить свою долю</button>
+                        <button class="btn-primary w-100 btn-pay" id="finalPayBtn">Оплатить</button>
                     </div>
                 </div>
             </section>
@@ -300,30 +277,15 @@
                 <button class="close-module-btn"><i class="fa-solid fa-xmark"></i></button>
                 <hr class="section-divider">
                 <h2>Our Cinemas</h2>
-                <p class="section-desc">Выберите наиболее удобное место для вашего следующего просмотра фильма.</p>
-                <div class="cards-grid">
-                    <div class="info-card cinema-card">
-                        <div class="cinema-icon"><i class="fa-solid fa-film"></i></div>
-                        <h3>Новый свет</h3>
-                        <p><i class="fa-solid fa-location-dot"></i> ул. Казахстанской правды 71</p>
-                        <div class="tags"><span>IMAX</span><span>Dolby Atmos</span></div>
-                        <a href="#" class="btn-outline">Show Schedule</a>
-                    </div>
-                    <div class="info-card cinema-card">
-                        <div class="cinema-icon"><i class="fa-solid fa-video"></i></div>
-                        <h3>Atlas Cinema</h3>
-                        <p><i class="fa-solid fa-location-dot"></i> ул. Жумабаева 91</p>
-                        <div class="tags"><span>3D</span><span>VIP Seats</span></div>
-                        <a href="#" class="btn-outline">Show Schedule</a>
-                    </div>
-                    <div class="info-card cinema-card">
-                        <div class="cinema-icon"><i class="fa-solid fa-popcorn"></i></div>
-                        <h3>Cinema Park</h3>
-                        <p><i class="fa-solid fa-location-dot"></i> ул. Шокана Уалиханова 56</p>
-                        <div class="tags"><span>4DX</span><span>Comfort</span></div>
-                        <a href="#" class="btn-outline">Show Schedule</a>
+                <div
+                    style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 25px; flex-wrap:wrap; gap:15px;">
+                    <p style="margin:0;">Выберите наиболее удобное место для вашего следующего просмотра фильма.</p>
+                    <div class="search-bar" style="width: 100%; max-width: 300px;">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="search" id="cinemaSearchInput" placeholder="Поиск кинотеатра...">
                     </div>
                 </div>
+                <div class="cards-grid" id="cinemasGridContainer"></div>
             </div>
 
             <div id="company" class="content-section toggleable-module module-hidden">
@@ -332,41 +294,7 @@
                 <h2>Find a Movie Buddy</h2>
                 <p class="section-desc">Не хотите идти один? Пообщайтесь с людьми, которые разделяют ваши вкусы в кино.
                 </p>
-                <div class="cards-grid">
-                    <div class="info-card buddy-card">
-                        <div class="buddy-header">
-                            <img src="img/avatar1.png" alt="Alex">
-                            <div>
-                                <h3>Александр, 22</h3>
-                                <span class="match-rate"><i class="fa-solid fa-fire"></i> Совпадение на 95%</span>
-                            </div>
-                        </div>
-                        <p>Wants to see: <strong>Шрек 5</strong></p>
-                        <button class="btn-primary w-100 action-restricted" data-action="invite">Send Invite</button>
-                    </div>
-                    <div class="info-card buddy-card">
-                        <div class="buddy-header">
-                            <img src="img/avatar2.png" alt="Maria">
-                            <div>
-                                <h3>Мария, 20</h3>
-                                <span class="match-rate"><i class="fa-solid fa-fire"></i> Совпадение на 88%</span>
-                            </div>
-                        </div>
-                        <p>Wants to see: <strong>Супер Марио</strong></p>
-                        <button class="btn-primary w-100 action-restricted" data-action="invite">Send Invite</button>
-                    </div>
-                    <div class="info-card buddy-card">
-                        <div class="buddy-header">
-                            <img src="img/avatar3.png" alt="Max">
-                            <div>
-                                <h3>Максим, 25</h3>
-                                <span class="match-rate"><i class="fa-solid fa-fire"></i> Совпадение на 74%</span>
-                            </div>
-                        </div>
-                        <p>Wants to see: <strong>Холоп 3</strong></p>
-                        <button class="btn-primary w-100 action-restricted" data-action="invite">Send Invite</button>
-                    </div>
-                </div>
+                <div class="cards-grid" id="buddiesGridContainer"></div>
             </div>
 
             <div id="collector" class="content-section toggleable-module module-hidden">
@@ -375,7 +303,7 @@
                 <h2>AI Collector & Cases</h2>
                 <p class="section-desc">Превратите свои билеты в кино в уникальные произведения искусства, созданные с
                     помощью искусственного интеллекта. Собирайте и открывайте специальные кейсы.</p>
-                <div class="ai-gallery">
+                <div class="ai-gallery" id="aiGalleryContainer">
                     <div class="ai-item">
                         <img src="img/ai-art1.png" alt="Ticket Art 1">
                         <div class="ai-item-overlay">Легендарный билет</div>
@@ -446,7 +374,7 @@
                 <p>Подпишитесь на нашу рассылку, чтобы получать эксклюзивные предложения и новости кино.</p>
             </div>
             <form id="newsletterForm" novalidate>
-                <div class="input-wrapper newsletter-input-wrapper">
+                <div class="input-wrapper newsletter-input-wrapper" style="margin-bottom:0;">
                     <input type="email" id="newsletterEmail" placeholder="Ваш Email адрес" required>
                     <span class="error-text"></span>
                 </div>
@@ -536,12 +464,10 @@
             </div>
         </div>
         <div class="chat-input">
-            <form id="chatForm" novalidate>
-                <div class="input-wrapper" style="flex-grow:1; margin-bottom:0;">
-                    <input type="text" id="chatMessageInput" placeholder="Type a message..." required
-                        style="background:none; border:none; color:inherit; outline:none; padding:5px;">
-                    <button type="submit" class="send-btn">➤</button>
-                </div>
+            <form id="chatForm" novalidate style="display:flex; width:100%; align-items:center;">
+                <input type="text" id="chatMessageInput" placeholder="Type a message..." required
+                    style="background:none; border:none; color:inherit; outline:none; padding:5px; width:100%;">
+                <button type="submit" class="send-btn">➤</button>
             </form>
         </div>
     </aside>
@@ -620,6 +546,36 @@
                             аккаунт</button>
                     </form>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-modal-overlay" id="movieModal">
+        <div class="auth-modal-card" style="max-width: 650px; padding: 25px;">
+            <button class="auth-modal-close" id="closeMovieModalBtn">&times;</button>
+            <div style="display: flex; gap: 25px; flex-wrap: wrap;">
+                <img id="modalMoviePoster"
+                    style="width: 200px; border-radius: 12px; object-fit: cover; box-shadow: 0 10px 20px rgba(0,0,0,0.5);"
+                    src="" alt="Poster">
+                <div
+                    style="display: flex; flex-direction: column; justify-content: center; gap: 15px; flex: 1; min-width: 200px;">
+                    <h2 id="modalMovieTitle" style="margin:0; font-size: 24px;"></h2>
+                    <p id="modalMovieMeta" style="color: var(--accent); font-weight: 600; font-size: 14px;"></p>
+                    <p id="modalMovieDesc" style="line-height: 1.6;">Забронируйте лучшие места на этот сеанс в
+                        кинотеатрах CineNova. Наслаждайтесь непревзойденным качеством изображения и звука.</p>
+                    <button id="modalBuyBtn" class="btn-primary" style="margin-top: 10px; width: 100%;">Выбрать
+                        кинотеатр</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-modal-overlay" id="ticketsModal">
+        <div class="auth-modal-card" style="max-width: 500px;">
+            <button class="auth-modal-close" id="closeTicketsModalBtn">&times;</button>
+            <h2><i class="fa-solid fa-ticket text-accent"></i> Мои билеты</h2>
+            <div id="ticketsContainer"
+                style="display: flex; flex-direction: column; gap: 15px; max-height: 400px; overflow-y: auto; padding-right: 10px; margin-top: 20px;">
             </div>
         </div>
     </div>

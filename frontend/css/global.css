@@ -15,7 +15,7 @@
 
 body.light-theme {
     --bg-body: #f4f6f8;
-    --bg-panel: #ffffff;
+    --bg-panel: #cfcfcf;
     --text-main: #111827;
     --text-muted: #6b7280;
 }
@@ -94,7 +94,6 @@ p { font-size: 14px; color: var(--text-muted); }
 .text-accent { color: var(--accent); }
 .font-semibold { font-weight: 600; }
 .hidden-element { display: none !important; }
-
 
 .beta-badge {
     background-color: var(--accent);

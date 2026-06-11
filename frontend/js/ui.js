@@ -61,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.stopPropagation();
                 selected.innerHTML = this.innerHTML;
                 itemsList.classList.add('select-hide');
+                if (window.updateCinemas) window.updateCinemas(this.innerHTML.trim());
             });
         });
         document.addEventListener('click', () => {
@@ -68,24 +69,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const searchInput = document.getElementById('movieSearch');
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            const cards = document.querySelectorAll('.movie-card');
-            cards.forEach(card => {
-                const title = card.querySelector('.movie-title').innerText.toLowerCase();
-                if (title.includes(query)) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        });
-    }
-
     const savedModules = JSON.parse(localStorage.getItem('openCineModules')) || [];
-    const navLinks = document.querySelectorAll('.main-nav a, .footer-nav a, .nav-trigger');
+    const navLinks = document.querySelectorAll('.main-nav a, .nav-trigger');
     savedModules.forEach(id => {
         const mod = document.getElementById(id);
         if (mod) mod.classList.remove('module-hidden');
@@ -178,31 +163,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const modal = document.getElementById('authModal');
     const closeModalBtn = document.getElementById('closeModalBtn');
-
     if (closeModalBtn && modal) {
         closeModalBtn.addEventListener('click', () => {
             modal.classList.remove('show-modal');
         });
     }
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            if (modal && modal.classList.contains('show-modal')) {
-                modal.classList.remove('show-modal');
-            }
-        }
-    });
 
-    const cookieBanner = document.getElementById('cookieBanner');
-    const acceptCookiesBtn = document.getElementById('acceptCookies');
-    if (!localStorage.getItem('cookiesAccepted') && cookieBanner) {
-        cookieBanner.classList.remove('hidden-element');
-    }
-    if (acceptCookiesBtn) {
-        acceptCookiesBtn.addEventListener('click', () => {
-            localStorage.setItem('cookiesAccepted', 'true');
-            cookieBanner.classList.add('hidden-element');
+    const movieModal = document.getElementById('movieModal');
+    const closeMovieModalBtn = document.getElementById('closeMovieModalBtn');
+    if (closeMovieModalBtn && movieModal) {
+        closeMovieModalBtn.addEventListener('click', () => {
+            movieModal.classList.remove('show-modal');
         });
     }
+
+    const footerLinks = document.querySelectorAll('.footer-col a, .footer-bottom a');
+    footerLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            const href = link.getAttribute('href');
+            if (href === '#' || href === '') {
+                e.preventDefault();
+                const sectionName = link.textContent.trim();
+                if (!link.classList.contains('action-restricted')) {
+                    if (window.showToast) window.showToast(`Раздел «${sectionName}» в разработке`, 'fa-person-digging');
+                }
+            }
+        });
+    });
 });
 
 function showToast(message, icon = 'fa-trophy') {

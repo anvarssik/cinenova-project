@@ -1,28 +1,28 @@
-const API_KEY = '4f10976f-818f-42b0-87c3-f1c58f949014';
 let moviesData = [];
 let querySearch = "";
 let activeFilter = localStorage.getItem('kinoFilter') || "All";
 let activeSort = localStorage.getItem('kinoSort') || "default";
 
+document.addEventListener('DOMContentLoaded', () => {
+    loadPremieres();
+    loadMovieBuddies();
+});
+
 async function loadPremieres() {
-    const currentYear = new Date().getFullYear();
-    const lastYear = currentYear - 1;
-    const API_URL = `https://kinopoiskapiunofficial.tech/api/v2.2/films?order=NUM_VOTE&type=FILM&yearFrom=${lastYear}&yearTo=${currentYear}&page=1`;
+    const API_URL = 'http://localhost:3000/api/movies'; 
+    
     try {
-        const response = await fetch(API_URL, {
-            method: 'GET',
-            headers: {
-                'X-API-KEY': API_KEY,
-                'Content-Type': 'application/json',
-            },
-        });
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error('Ошибка сервера');
         const data = await response.json();
-        if (data.items) {
-            moviesData = data.items.slice(0, 30);
+        if (data && data.length > 0) {
+            moviesData = data;
             setupControls();
             updateMoviesUI();
         }
-    } catch (error) { }
+    } catch (error) { 
+        console.error('Ошибка при получении фильмов с бэкенда:', error);
+    }
 }
 
 function setupControls() {
@@ -131,24 +131,39 @@ function renderMovies(movies) {
             genresText = movie.genres.map(g => g.genre).slice(0, 2).join(', ');
         }
 
+        const movieYear = movie.year ? movie.year : '';
+        const metaText = movieYear ? `${genresText} • ${movieYear}` : genresText;
+        const titleText = getMovieTitle(movie);
+
         const article = document.createElement('article');
         article.className = 'movie-card';
+        article.style.cursor = 'pointer';
+
+        article.addEventListener('click', () => {
+            const modal = document.getElementById('movieModal');
+            document.getElementById('modalMoviePoster').src = movie.posterUrlPreview;
+            document.getElementById('modalMovieTitle').textContent = titleText;
+            document.getElementById('modalMovieMeta').textContent = `${metaText} | Рейтинг: ${movie.ratingKinopoisk || 'N/A'}`;
+            window.selectedMovieTitle = titleText;
+            document.getElementById('checkoutMovieTitle').textContent = titleText;
+            modal.classList.add('show-modal');
+        });
 
         const posterWrapper = document.createElement('div');
         posterWrapper.className = 'poster-wrapper';
 
         const img = document.createElement('img');
         img.src = movie.posterUrlPreview;
-        img.alt = getMovieTitle(movie);
+        img.alt = titleText;
         img.className = 'movie-poster';
 
         const title = document.createElement('h3');
         title.className = 'movie-title';
-        title.textContent = getMovieTitle(movie);
+        title.textContent = titleText;
 
         const genre = document.createElement('p');
         genre.className = 'movie-genre';
-        genre.textContent = genresText;
+        genre.textContent = metaText;
 
         posterWrapper.appendChild(img);
         article.appendChild(posterWrapper);
@@ -159,22 +174,12 @@ function renderMovies(movies) {
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    loadPremieres();
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    loadMovieBuddies();
-});
-
 async function loadMovieBuddies() {
     try {
         const response = await fetch('/api/users');
         const users = await response.json();
         renderBuddies(users);
-    } catch (error) {
-        console.error("Ошибка при загрузке пользователей с сервера:", error);
-    }
+    } catch (error) { }
 }
 
 function renderBuddies(users) {
@@ -202,8 +207,9 @@ function renderBuddies(users) {
         const inviteBtn = card.querySelector('button');
         inviteBtn.addEventListener('click', (e) => {
             e.preventDefault();
-            if (checkAuthFlow()) {
+            if (typeof checkAuthFlow === 'function' && checkAuthFlow()) {
                 if (window.showToast) window.showToast('Инвайт успешно отправлен!', 'fa-paper-plane');
+                if (window.unlockAchievement) window.unlockAchievement('ach2', 'Душа компании', 'fa-users');
             }
         });
 

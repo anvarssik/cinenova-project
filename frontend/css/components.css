@@ -47,6 +47,7 @@
 .ai-arts img {
     width: calc(50% - 5px);
     object-fit: cover;
+    border-radius: 8px;
 }
 
 .action-link {
@@ -298,7 +299,7 @@
 .movie-card:hover {
     transform: scale(1.03) translateY(-3px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    /*border-color: var(--accent);*/
+    border-color: var(--accent);
 }
 
 .movie-card img {
@@ -754,209 +755,6 @@
     color: var(--accent);
 }
 
-.cookie-banner {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: var(--bg-panel);
-    border-top: 1px solid rgba(139, 149, 165, 0.2);
-    padding: 15px 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    z-index: 9999;
-    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
-}
-
-.cookie-banner p {
-    margin: 0;
-    font-size: 13px;
-    color: var(--text-muted);
-}
-
-.cookie-banner a {
-    color: var(--accent);
-    text-decoration: underline;
-}
-
-.floating-chat-btn {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background: var(--accent);
-    color: #0b0f19;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    font-size: 24px;
-    box-shadow: 0 10px 20px rgba(0, 230, 168, 0.4);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 998;
-    transition: transform 0.3s;
-}
-
-.floating-chat-btn:hover {
-    transform: scale(1.1);
-}
-
-.ai-assistant-chat {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    width: 320px;
-    padding: 20px;
-    background-color: var(--bg-panel);
-    border-radius: var(--radius-md);
-    border: 1px solid rgba(139, 149, 165, 0.2);
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-    z-index: 999;
-}
-
-.chat-header {
-    display: flex;
-    align-items: center;
-    border-bottom: 1px solid rgba(139, 149, 165, 0.1);
-    padding-bottom: 15px;
-}
-
-.chat-logo {
-    width: 35px;
-    height: 35px;
-    object-fit: contain;
-}
-
-.chat-header h4 {
-    margin-left: 10px;
-    flex-grow: 1;
-}
-
-.close-chat {
-    color: var(--text-muted);
-    font-size: 18px;
-    padding: 5px;
-}
-
-.close-chat:hover {
-    color: #ff5e62;
-}
-
-.ai-message {
-    background-color: rgba(139, 149, 165, 0.1);
-    padding: 15px;
-    border-radius: 12px;
-    font-size: 13px;
-}
-
-.ai-message strong {
-    color: var(--accent);
-}
-
-.chat-input {
-    position: relative;
-    display: flex;
-    align-items: center;
-    background-color: rgba(139, 149, 165, 0.05);
-    border: 1px solid rgba(139, 149, 165, 0.2);
-    border-radius: 20px;
-    padding: 5px 40px 5px 15px;
-}
-.chat-input input {
-    background: transparent;
-    border: none;
-    outline: none;
-    width: 100%;
-    color: var(--text-main);
-}
-
-.send-btn {
-    position: absolute;
-    right: 15px;
-    cursor: pointer;
-    color: var(--accent);
-    font-size: 18px;
-    display: flex;
-    align-items: center;
-}
-
-.send-btn {
-    color: var(--accent);
-    font-size: 18px;
-}
-
-.scroll-top-btn {
-    position: fixed;
-    bottom: 30px;
-    left: 30px;
-    background: rgba(139, 149, 165, 0.2);
-    color: var(--text-main);
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    font-size: 18px;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 998;
-    backdrop-filter: blur(5px);
-    transition: background 0.3s, opacity 0.3s;
-}
-
-.scroll-top-btn.visible {
-    display: flex;
-    animation: fadeIn 0.3s;
-}
-
-.scroll-top-btn:hover {
-    background: var(--accent);
-    color: #0b0f19;
-}
-
-.toast-container {
-    position: fixed;
-    top: 100px;
-    right: 30px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 2000;
-}
-
-.toast {
-    background: var(--bg-panel);
-    border-left: 4px solid var(--accent);
-    padding: 15px 20px;
-    border-radius: var(--radius-sm);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    animation: slideInRight 0.3s ease forwards;
-    color: var(--text-main);
-}
-
-.toast i {
-    color: var(--accent);
-    font-size: 20px;
-}
-
-@keyframes slideInRight {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
 .auth-modal-overlay {
     position: fixed;
     top: 0;
@@ -998,6 +796,28 @@
 
 .auth-modal-close:hover {
     color: #ff5e62;
+}
+
+.my-ticket-card {
+    background: rgba(139, 149, 165, 0.05);
+    border: 1px solid rgba(139, 149, 165, 0.2);
+    border-radius: var(--radius-md);
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    overflow: hidden;
+}
+
+.my-ticket-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--accent);
 }
 
 @media (max-width: 768px) {
@@ -1056,11 +876,5 @@
     .dual-layout {
         grid-template-columns: 1fr;
         gap: 25px;
-    }
-
-    .cookie-banner {
-        flex-direction: column;
-        gap: 15px;
-        text-align: center;
     }
 }

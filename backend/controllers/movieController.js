@@ -1,37 +1,59 @@
-const movies = [
-    { id: 1, nameRu: "Супер Марио: Галактическое кино", genres: [{ genre: "Мультфильм" }], ratingKinopoisk: 6.6, year: 2023, posterUrlPreview: "img/mario-poster-small.png" },
-    { id: 2, nameRu: "Холоп 3", genres: [{ genre: "Комедия" }], ratingKinopoisk: 7.2, year: 2024, posterUrlPreview: "img/movie-holop.png" },
-    { id: 3, nameRu: "Шрек 5", genres: [{ genre: "Мультфильм" }], ratingKinopoisk: 8.5, year: 2025, posterUrlPreview: "img/movie-shreak5.png" }
-];
+const db = require('../database/db');
 
 const getMovies = (req, res) => {
-    let result = [...movies];
+    let query = 'SELECT * FROM movies';
+    let params = [];
 
-    if (req.query.genre) {
-        result = result.filter(m => m.genres[0].genre.toLowerCase() === req.query.genre.toLowerCase());
-    }
-    if (req.query.sort === 'desc') {
-        result.sort((a, b) => b.ratingKinopoisk - a.ratingKinopoisk);
-    } else if (req.query.sort === 'asc') {
-        result.sort((a, b) => a.ratingKinopoisk - b.ratingKinopoisk);
-    }
-    if (req.query.limit) {
-        result = result.slice(0, parseInt(req.query.limit));
+    if (req.query.genre && req.query.genre !== 'All') {
+        query += ' WHERE LOWER(genre) = LOWER(?)';
+        params.push(req.query.genre);
     }
 
-    res.json(result);
+    if (req.query.sort === 'desc' || req.query.sort === 'ratingDesc') {
+        query += ' ORDER BY rating DESC';
+    } else if (req.query.sort === 'asc' || req.query.sort === 'ratingAsc') {
+        query += ' ORDER BY rating ASC';
+    } else if (req.query.sort === 'yearDesc') {
+        query += ' ORDER BY release_year DESC';
+    }
+
+    db.all(query, params, (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        const mappedRows = rows.map(m => ({
+            id: m.id,
+            nameRu: m.title,
+            genres: [{ genre: m.genre }],
+            ratingKinopoisk: m.rating,
+            year: m.release_year,
+            posterUrlPreview: m.poster_url || 'img/mario-poster-small.png'
+        }));
+        res.json(mappedRows);
+    });
 };
 
 const getMovieById = (req, res) => {
     const movieId = parseInt(req.params.id);
-    const movie = movies.find(m => m.id === movieId);
-
-    if (!movie) {
-        return res.status(404).json({ message: "Фильм с таким ID не найден" });
-    }
-
-    res.json(movie);
+    db.get('SELECT * FROM movies WHERE id = ?', [movieId], (err, row) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (!row) {
+            return res.status(404).json({ message: "Фильм с таким ID не найден" });
+        }
+        const mappedMovie = {
+            id: row.id,
+            nameRu: row.title,
+            genres: [{ genre: row.genre }],
+            ratingKinopoisk: row.rating,
+            year: row.release_year,
+            posterUrlPreview: row.poster_url || 'img/mario-poster-small.png'
+        };
+        res.json(mappedMovie);
+    });
 };
+
 module.exports = {
     getMovies,
     getMovieById
