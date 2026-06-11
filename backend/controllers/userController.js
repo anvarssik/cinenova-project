@@ -1,18 +1,25 @@
 const db = require('../database/db');
 
 const getUsers = (req, res) => {
-    db.all('SELECT * FROM users', [], (err, rows) => {
+    db.all('SELECT id, login, email, phone FROM users', [], (err, rows) => {
         if (err) {
             return res.status(500).json({ error: err.message });
         }
-        const mappedUsers = rows.map((u, index) => ({
-            id: u.id,
-            name: u.login,
-            age: 20 + (u.id % 5),
-            match: 80 + (u.id % 19),
-            avatar: `img/avatar${(index % 3) + 1}.png`,
-            wantsToSee: "Супер Марио"
-        }));
+
+        const mappedUsers = rows.map((user, index) => {
+            const avatars = ['img/avatar1.png', 'img/avatar2.png', 'img/avatar3.png'];
+            const movies = ['Супер Марио', 'Шрек 5', 'Холоп 3', 'Дюна: Часть третья'];
+            
+            return {
+                id: user.id,
+                name: user.login,
+                age: 18 + (user.id % 10), 
+                match: 75 + (user.id % 21), 
+                avatar: avatars[index % avatars.length],
+                wantsToSee: movies[index % movies.length]
+            };
+        });
+
         res.json(mappedUsers);
     });
 };

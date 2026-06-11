@@ -175,11 +175,18 @@ function renderMovies(movies) {
 }
 
 async function loadMovieBuddies() {
+    const API_URL = 'http://localhost:3000/api/users';
     try {
-        const response = await fetch('/api/users');
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error('Ошибка при получении пользователей');
+        
         const users = await response.json();
         renderBuddies(users);
-    } catch (error) { }
+        
+        window.buddiesListData = users; 
+    } catch (error) {
+        console.error('Не удалось загрузить друзей из БД:', error);
+    }
 }
 
 function renderBuddies(users) {

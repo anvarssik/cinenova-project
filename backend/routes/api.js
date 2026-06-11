@@ -1,22 +1,13 @@
 const express = require('express');
 const router = express.Router();
 
-const userController = require('../controllers/userController');
-const movieController = require('../controllers/movieController');
-const cinemaController = require('../controllers/cinemaController');
+const { getMovies, getMovieById } = require('../controllers/movieController');
+const { getUsers } = require('../controllers/userController');
+const { getCinemas } = require('../controllers/cinemaController');
 
-router.get('/', (req, res) => {
-    res.json({ message: "API is working" });
-});
-
-router.get('/users', userController.getUsers);
-router.get('/movies', movieController.getMovies); 
-router.get('/movies/:id', movieController.getMovieById);
-
-router.get('/cinemas', cinemaController.getCinemas);
-
-router.use((req, res) => {
-    res.status(404).json({ message: "API маршрут не найден (Ошибка 404)" });
-});
+router.get('/movies', getMovies);
+router.get('/movies/:id', getMovieById);
+router.get('/users', getUsers);
+router.get('/cinemas', getCinemas);
 
 module.exports = router;
