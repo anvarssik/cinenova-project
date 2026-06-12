@@ -1,4 +1,5 @@
 let moviesData = [];
+let cinemasData = [];
 let querySearch = "";
 let activeFilter = localStorage.getItem('kinoFilter') || "All";
 let activeSort = localStorage.getItem('kinoSort') || "default";
@@ -6,11 +7,29 @@ let activeSort = localStorage.getItem('kinoSort') || "default";
 document.addEventListener('DOMContentLoaded', () => {
     loadPremieres();
     loadMovieBuddies();
+    loadCinemas();
 });
 
+async function loadCinemas() {
+    const API_URL = 'http://localhost:3000/api/cinemas';
+
+    try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error(`Ошибка HTTP: ${response.status}`);
+        const data = await response.json();
+
+        if (data && data.length > 0) {
+            cinemasData = data;
+            console.log('Кинотеатры успешно загружены из БД:', cinemasData);
+        }
+    } catch (error) {
+        console.error('Ошибка при загрузке кинотеатров с бэкенда:', error);
+    }
+}
+
 async function loadPremieres() {
-    const API_URL = 'http://localhost:3000/api/movies'; 
-    
+    const API_URL = 'http://localhost:3000/api/movies';
+
     try {
         const response = await fetch(API_URL);
         if (!response.ok) throw new Error('Ошибка сервера');
@@ -20,7 +39,7 @@ async function loadPremieres() {
             setupControls();
             updateMoviesUI();
         }
-    } catch (error) { 
+    } catch (error) {
         console.error('Ошибка при получении фильмов с бэкенда:', error);
     }
 }
@@ -179,11 +198,11 @@ async function loadMovieBuddies() {
     try {
         const response = await fetch(API_URL);
         if (!response.ok) throw new Error('Ошибка при получении пользователей');
-        
+
         const users = await response.json();
         renderBuddies(users);
-        
-        window.buddiesListData = users; 
+
+        window.buddiesListData = users;
     } catch (error) {
         console.error('Не удалось загрузить друзей из БД:', error);
     }

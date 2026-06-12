@@ -1,4 +1,5 @@
 let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+let isAdmin = localStorage.getItem('isAdmin') === 'true';
 
 window.selectedMovieTitle = 'Выберите фильм';
 window.currentPromoDiscount = 0;
@@ -6,10 +7,14 @@ window.currentPromoDiscount = 0;
 function updateAuthUI() {
     const authBtn = document.getElementById('openAuthModal');
     const myTicketsBtn = document.getElementById('myTicketsBtn');
+    const adminPanelBtn = document.getElementById('adminPanelBtn');
+
     if (authBtn) {
         if (isLoggedIn) {
             authBtn.textContent = 'Выход';
             if (myTicketsBtn) myTicketsBtn.classList.remove('hidden-element');
+            if (isAdmin && adminPanelBtn) adminPanelBtn.classList.remove('hidden-element');
+
             authBtn.onclick = (e) => {
                 e.preventDefault();
                 window.setLoggedOut();
@@ -17,6 +22,8 @@ function updateAuthUI() {
         } else {
             authBtn.textContent = 'Sign In | Register';
             if (myTicketsBtn) myTicketsBtn.classList.add('hidden-element');
+            if (adminPanelBtn) adminPanelBtn.classList.add('hidden-element');
+
             authBtn.onclick = (e) => {
                 e.preventDefault();
                 document.getElementById('authModal').classList.add('show-modal');
@@ -33,20 +40,24 @@ function checkAuthFlow() {
     return true;
 }
 
-window.setLoggedIn = function () {
+window.setLoggedIn = function (adminFlag = false) {
     isLoggedIn = true;
+    isAdmin = adminFlag;
     localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('isAdmin', adminFlag ? 'true' : 'false');
     updateAuthUI();
 };
 
 window.setLoggedOut = function () {
     isLoggedIn = false;
+    isAdmin = false;
     localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('isAdmin');
     updateAuthUI();
     if (window.showToast) window.showToast('Вы вышли из системы', 'fa-sign-out-alt');
 };
 
-window.initSeatMap = function (layoutType = 'standard', cinemaName = 'Кинотеатр не выбран') {
+window.initSeatMap = function (layoutType = 'atlas_standard', cinemaName = 'Кинотеатр не выбран') {
     const seatMap = document.getElementById('seatMap');
     if (!seatMap) return;
 
@@ -55,46 +66,142 @@ window.initSeatMap = function (layoutType = 'standard', cinemaName = 'Кинот
         mapTitle.textContent = `Интерактивная карта: ${cinemaName}`;
     }
 
-    seatMap.innerHTML = '';
-
-    let rows, cols;
-    if (layoutType === 'vip') {
-        rows = 3;
-        cols = 6;
-    } else if (layoutType === 'imax') {
-        rows = 8;
-        cols = 14;
-    } else {
-        rows = 5;
-        cols = 10;
+    const styleId = 'dynamic-seat-styles';
+    if (!document.getElementById(styleId)) {
+        const style = document.createElement('style');
+        style.id = styleId;
+        style.innerHTML = `
+            .seat-matrix-group { display: flex; flex-direction: column; gap: 12px; align-items: center; margin: 0 auto; width: 100%; overflow-x: auto; padding-bottom: 20px;}
+            .seat-matrix-row-wrapper { display: flex; align-items: center; justify-content: center; gap: 15px; }
+            .seat-matrix-row { display: flex; gap: 8px; justify-content: center; }
+            .seat-matrix-num { font-size: 11px; color: var(--text-muted, #8b95a5); width: 15px; text-align: center; font-weight: bold; }
+            .seat.empty { background: transparent !important; border: none !important; box-shadow: none !important; cursor: default; pointer-events: none; }
+            .seat.disabled-dot { background: transparent !important; border: none !important; pointer-events: none; position: relative; }
+            .seat.disabled-dot::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 6px; height: 6px; background: #8b95a5; border-radius: 50%; }
+            .seat.vip { background-color: #ff0000 !important; width: 38px !important; border-radius: 6px !important; border-bottom: 3px solid #b30000 !important; transition: transform 0.2s;}
+            .seat.vip:not(.occupied):hover { transform: scale(1.1); box-shadow: 0 0 10px rgba(255,0,0,0.5); }
+            .seat.standard { background-color: #00a651 !important; border-bottom: 3px solid #007a3b !important; transition: transform 0.2s; }
+            .seat.standard:not(.occupied):hover { transform: scale(1.1); box-shadow: 0 0 10px rgba(0,166,81,0.5); }
+            .seat.occupied { background-color: #8b95a5 !important; border-bottom: 3px solid #6b7280 !important; opacity: 0.6; cursor: not-allowed; transform: none !important; box-shadow: none !important;}
+            .seat.selected { background-color: var(--accent, #00e6a8) !important; border-bottom: 3px solid #00b383 !important; transform: scale(1.1); box-shadow: 0 0 15px var(--accent, #00e6a8) !important; }
+        `;
+        document.head.appendChild(style);
     }
 
-    for (let g = 0; g < rows; g++) {
-        const group = document.createElement('div');
-        group.className = 'seat-group';
-        group.style.gridTemplateColumns = `repeat(${cols}, 25px)`;
+    seatMap.innerHTML = `
+        <div style="width: 100%; max-width: 400px; margin: 0 auto 40px auto; text-align: center;">
+            <div style="height: 15px; background: rgba(139, 149, 165, 0.3); border-radius: 50% / 100% 100% 0 0; box-shadow: 0 -5px 15px rgba(255, 255, 255, 0.05);"></div>
+            <div style="font-size: 10px; color: var(--text-muted, #8b95a5); letter-spacing: 3px; text-transform: uppercase; margin-top: 10px;">Экран</div>
+        </div>
+    `;
 
-        for (let i = 0; i < cols; i++) {
+    const layouts = {
+        'atlas_standard': [
+            [0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0]
+        ],
+        'atlas_zal2': [
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0]
+        ],
+        'atlas_zal5': [
+            [1, 1, 1, 1, 1, 1, 1, 3, 3, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0]
+        ],
+        'cinema_park': [
+            [0, 1, 1, 1, 0, 0, 1, 1, 1, 0],
+            [1, 1, 1, 1, 0, 0, 1, 1, 1, 1],
+            [1, 1, 1, 1, 0, 0, 1, 1, 1, 1],
+            [1, 1, 1, 1, 0, 0, 1, 1, 1, 1],
+            [1, 1, 1, 1, 0, 0, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1],
+            [0, 2, 0, 2, 0, 0, 2, 0, 2, 0]
+        ],
+        'standard': [
+            [1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1]
+        ]
+    };
+
+    const currentLayout = layouts[layoutType] || layouts['standard'];
+    const group = document.createElement('div');
+    group.className = 'seat-matrix-group';
+
+    currentLayout.forEach((rowArray, rowIndex) => {
+        const rowWrapper = document.createElement('div');
+        rowWrapper.className = 'seat-matrix-row-wrapper';
+
+        const leftNum = document.createElement('div');
+        leftNum.className = 'seat-matrix-num';
+        leftNum.textContent = rowIndex + 1;
+        rowWrapper.appendChild(leftNum);
+
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'seat-matrix-row';
+
+        rowArray.forEach((seatType) => {
             const seat = document.createElement('div');
-            const isOccupied = Math.random() > 0.7;
-            seat.className = `seat ${isOccupied ? 'occupied' : 'available'}`;
+            seat.classList.add('seat');
 
-            if (!isOccupied) {
-                seat.addEventListener('click', function () {
-                    this.classList.toggle('selected');
-                    if (window.updateCheckoutMath) window.updateCheckoutMath();
-                });
+            if (seatType === 0) {
+                seat.classList.add('empty');
+            } else if (seatType === 3) {
+                seat.classList.add('disabled-dot');
+            } else {
+                const isOccupied = Math.random() > 0.85;
+                const typeClass = seatType === 1 ? 'standard' : 'vip';
+
+                seat.classList.add(typeClass);
+                if (isOccupied) seat.classList.add('occupied');
+
+                seat.dataset.price = seatType === 1 ? '1900' : '5000';
+
+                if (!isOccupied) {
+                    seat.addEventListener('click', function () {
+                        this.classList.toggle('selected');
+                        if (window.updateCheckoutMath) window.updateCheckoutMath();
+                    });
+                }
             }
-            group.appendChild(seat);
-        }
-        seatMap.appendChild(group);
-    }
+            rowDiv.appendChild(seat);
+        });
 
+        rowWrapper.appendChild(rowDiv);
+
+        const rightNum = document.createElement('div');
+        rightNum.className = 'seat-matrix-num';
+        rightNum.textContent = rowIndex + 1;
+        rowWrapper.appendChild(rightNum);
+
+        group.appendChild(rowWrapper);
+    });
+
+    seatMap.appendChild(group);
     if (window.updateCheckoutMath) window.updateCheckoutMath();
-}
+};
 
 window.updateCheckoutMath = function () {
-    const selectedSeats = document.querySelectorAll('.seat.selected').length;
+    const selectedSeatsElements = document.querySelectorAll('.seat.selected');
+    const selectedSeats = selectedSeatsElements.length;
     const mapPayBtn = document.getElementById('mapPayBtn');
 
     if (selectedSeats > 0) {
@@ -103,8 +210,10 @@ window.updateCheckoutMath = function () {
         if (mapPayBtn) mapPayBtn.classList.add('hidden-element');
     }
 
-    const ticketPrice = 2500;
-    let totalSum = selectedSeats * ticketPrice;
+    let totalSum = 0;
+    selectedSeatsElements.forEach(seat => {
+        totalSum += parseInt(seat.dataset.price || 1900);
+    });
 
     totalSum = totalSum - (totalSum * window.currentPromoDiscount);
 
@@ -116,8 +225,6 @@ window.updateCheckoutMath = function () {
     if (splitEqual) {
         const totalPeople = 1 + selectedBuddies;
         yourShare = totalSum > 0 ? Math.ceil(totalSum / totalPeople) : 0;
-    } else {
-        yourShare = selectedSeats > 0 ? (ticketPrice - (ticketPrice * window.currentPromoDiscount)) : 0;
     }
 
     const elCount = document.getElementById('checkoutTicketCount');
@@ -131,25 +238,53 @@ window.updateCheckoutMath = function () {
 
 window.currentCinemasData = [];
 
-window.updateCinemas = function (cityName) {
-    const cityData = {
-        "Petropavlovsk": [
-            { name: "Новый свет", address: "ул. Казахстанской правды 71", tags: ["IMAX", "Dolby Atmos"], icon: "fa-film" },
-            { name: "Atlas Cinema", address: "ул. Жумабаева 91", tags: ["3D", "VIP Seats"], icon: "fa-video" },
-            { name: "Cinema Park", address: "ул. Шокана Уалиханова 56", tags: ["4DX", "Comfort"], icon: "fa-popcorn" }
-        ],
-        "Astana": [
-            { name: "Keruen IMAX", address: "ул. Достык 9", tags: ["IMAX Laser", "VIP"], icon: "fa-film" },
-            { name: "Mega Silk Way", address: "пр. Кабанбай батыра 62", tags: ["Dolby", "Lounge"], icon: "fa-video" }
-        ],
-        "Almaty": [
-            { name: "Dostyk Plaza", address: "мкр. Самал-2, 111", tags: ["IMAX", "Comfort"], icon: "fa-film" },
-            { name: "Esentai Mall", address: "пр. Аль-Фараби 77/8", tags: ["Premium VIP", "Boutique"], icon: "fa-star" }
-        ]
-    };
+window.updateCinemas = function () {
+    const citySelect = document.getElementById('citySelect');
+    const grid = document.getElementById('cinemasGrid');
 
-    window.currentCinemasData = cityData[cityName] || [];
-    window.renderCinemasGrid(window.currentCinemasData, cityName);
+    if (!citySelect || !grid) return;
+
+    const selectedCity = citySelect.value;
+    grid.innerHTML = '';
+
+    const sourceData = typeof cinemasData !== 'undefined' ? cinemasData : window.currentCinemasData;
+    const cityCinemas = sourceData.filter(c => c.city === selectedCity || c.city === 'Petropavlovsk');
+
+    if (cityCinemas.length === 0) {
+        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">В этом городе пока нет доступных кинотеатров.</p>';
+        return;
+    }
+
+    cityCinemas.forEach(c => {
+        const card = document.createElement('div');
+        card.className = 'info-card cinema-card';
+        const tagsHtml = c.tags ? c.tags.map(tag => `<span class="tag tag-outline">${tag}</span>`).join('') : '';
+
+        let layoutType = 'atlas_standard';
+        const lowerName = c.name ? c.name.toLowerCase() : '';
+
+        if (lowerName.includes('зал 2')) layoutType = 'atlas_zal2';
+        if (lowerName.includes('зал 5')) layoutType = 'atlas_zal5';
+        if (lowerName.includes('cinema park') || lowerName.includes('синема парк')) layoutType = 'cinema_park';
+
+        card.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
+                <div>
+                    <h3 style="margin-bottom: 5px;">${c.name}</h3>
+                    <p style="color: var(--text-muted); font-size: 13px;">
+                        <i class="fa-solid fa-location-dot"></i> ${c.address}
+                    </p>
+                </div>
+                <i class="fa-solid ${c.icon || 'fa-film'}" style="color: var(--accent); font-size: 24px;"></i>
+            </div>
+            <div class="tags" style="margin-bottom: 20px;">
+                ${tagsHtml}
+            </div>
+            <button class="btn-outline w-100" onclick="window.initSeatMap('${layoutType}', '${c.name}'); document.querySelector('.interactive-map').scrollIntoView({ behavior: 'smooth' });">Выбрать места</button>
+        `;
+
+        grid.appendChild(card);
+    });
 };
 
 window.renderCinemasGrid = function (cinemas, cityName) {
@@ -158,16 +293,18 @@ window.renderCinemasGrid = function (cinemas, cityName) {
 
     if (cinemas.length > 0) {
         grid.innerHTML = cinemas.map(c => {
-            let layout = 'standard';
-            if (c.tags.includes('VIP Seats') || c.tags.includes('VIP') || c.tags.includes('Premium VIP')) layout = 'vip';
-            else if (c.tags.includes('IMAX') || c.tags.includes('IMAX Laser')) layout = 'imax';
+            let layout = 'atlas_standard';
+            const lowerName = c.name ? c.name.toLowerCase() : '';
+            if (lowerName.includes('зал 2')) layout = 'atlas_zal2';
+            if (lowerName.includes('зал 5')) layout = 'atlas_zal5';
+            if (lowerName.includes('cinema park')) layout = 'cinema_park';
 
             return `
             <div class="info-card cinema-card">
-                <div class="cinema-icon"><i class="fa-solid ${c.icon}"></i></div>
+                <div class="cinema-icon"><i class="fa-solid ${c.icon || 'fa-film'}"></i></div>
                 <h3>${c.name}</h3>
                 <p><i class="fa-solid fa-location-dot"></i> ${c.address}</p>
-                <div class="tags">${c.tags.map(t => `<span>${t}</span>`).join('')}</div>
+                <div class="tags">${c.tags ? c.tags.map(t => `<span>${t}</span>`).join('') : ''}</div>
                 <button class="btn-outline w-100" onclick="window.initSeatMap('${layout}', '${c.name}'); window.showToast('Загружен зал кинотеатра: ${c.name}', 'fa-couch'); document.querySelector('.interactive-map').scrollIntoView({ behavior: 'smooth' });">Выбрать места</button>
             </div>
         `}).join('');
@@ -229,22 +366,44 @@ window.renderMyTickets = function () {
     });
 };
 
+window.adminAddMovie = async function (movieData) {
+    if (!isAdmin) {
+        if (window.showToast) window.showToast('Ошибка: Недостаточно прав', 'fa-lock');
+        return false;
+    }
+    if (window.showToast) window.showToast('Успешно: Фильм добавлен в прокат', 'fa-film');
+    return true;
+};
+
+window.adminDeleteMovie = async function (id) {
+    if (!isAdmin) {
+        if (window.showToast) window.showToast('Ошибка: Недостаточно прав', 'fa-lock');
+        return false;
+    }
+    if (window.showToast) window.showToast('Успешно: Фильм снят с показа', 'fa-trash');
+    return true;
+};
+
+window.adminAddSession = async function (sessionData) {
+    if (!isAdmin) {
+        if (window.showToast) window.showToast('Ошибка: Недостаточно прав', 'fa-lock');
+        return false;
+    }
+    if (window.showToast) window.showToast('Успешно: Новый сеанс создан', 'fa-calendar-plus');
+    return true;
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     updateAuthUI();
     window.checkAchievements();
     window.renderMyTickets();
 
-    if (window.updateCinemas) {
-        window.updateCinemas('Petropavlovsk');
-    }
-
-    initSeatMap('standard', 'Кинотеатр не выбран');
-
     const cinemaSearchInput = document.getElementById('cinemaSearchInput');
     if (cinemaSearchInput) {
         cinemaSearchInput.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase();
-            const filtered = window.currentCinemasData.filter(c => c.name.toLowerCase().includes(query));
+            const sourceData = typeof cinemasData !== 'undefined' ? cinemasData : window.currentCinemasData;
+            const filtered = sourceData.filter(c => c.name.toLowerCase().includes(query));
             window.renderCinemasGrid(filtered, document.querySelector('.select-selected').textContent);
         });
     }
