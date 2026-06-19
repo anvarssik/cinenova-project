@@ -71,74 +71,75 @@ window.initSeatMap = function (layoutType = 'atlas_standard', cinemaName = 'Ки
         const style = document.createElement('style');
         style.id = styleId;
         style.innerHTML = `
-            .seat-matrix-group { display: flex; flex-direction: column; gap: 12px; align-items: center; margin: 0 auto; width: 100%; overflow-x: auto; padding-bottom: 20px;}
+            .seat-matrix-group { display: flex; flex-direction: column; gap: 10px; align-items: center; margin: 0 auto; width: 100%; overflow-x: auto; padding-bottom: 20px;}
             .seat-matrix-row-wrapper { display: flex; align-items: center; justify-content: center; gap: 15px; }
             .seat-matrix-row { display: flex; gap: 8px; justify-content: center; }
-            .seat-matrix-num { font-size: 11px; color: var(--text-muted, #8b95a5); width: 15px; text-align: center; font-weight: bold; }
+            .seat-matrix-num { font-size: 13px; color: var(--text-muted, #8b95a5); width: 20px; text-align: center; font-weight: bold; }
+            .seat { width: 30px; height: 30px; border-radius: 6px; cursor: pointer; flex-shrink: 0; transition: transform 0.2s, box-shadow 0.2s; box-sizing: border-box; }
             .seat.empty { background: transparent !important; border: none !important; box-shadow: none !important; cursor: default; pointer-events: none; }
             .seat.disabled-dot { background: transparent !important; border: none !important; pointer-events: none; position: relative; }
-            .seat.disabled-dot::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 6px; height: 6px; background: #8b95a5; border-radius: 50%; }
-            .seat.vip { background-color: #ff0000 !important; width: 38px !important; border-radius: 6px !important; border-bottom: 3px solid #b30000 !important; transition: transform 0.2s;}
+            .seat.disabled-dot::after { content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 8px; height: 8px; background: #8b95a5; border-radius: 50%; }
+            .seat.vip { width: 45px; height: 40px; background-color: #ff0000 !important; border-radius: 8px !important; border-bottom: 4px solid #b30000 !important; }
             .seat.vip:not(.occupied):hover { transform: scale(1.1); box-shadow: 0 0 10px rgba(255,0,0,0.5); }
-            .seat.standard { background-color: #00a651 !important; border-bottom: 3px solid #007a3b !important; transition: transform 0.2s; }
+            .seat.standard { background-color: #00a651 !important; border-bottom: 4px solid #007a3b !important; }
             .seat.standard:not(.occupied):hover { transform: scale(1.1); box-shadow: 0 0 10px rgba(0,166,81,0.5); }
-            .seat.occupied { background-color: #8b95a5 !important; border-bottom: 3px solid #6b7280 !important; opacity: 0.6; cursor: not-allowed; transform: none !important; box-shadow: none !important;}
-            .seat.selected { background-color: var(--accent, #00e6a8) !important; border-bottom: 3px solid #00b383 !important; transform: scale(1.1); box-shadow: 0 0 15px var(--accent, #00e6a8) !important; }
+            .seat.occupied { background-color: #4b5563 !important; border-bottom: 4px solid #374151 !important; opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important;}
+            .seat.selected { background-color: var(--accent, #00e6a8) !important; border-bottom: 4px solid #00b383 !important; transform: scale(1.1); box-shadow: 0 0 15px var(--accent, #00e6a8) !important; }
         `;
         document.head.appendChild(style);
     }
 
     seatMap.innerHTML = `
-        <div style="width: 100%; max-width: 400px; margin: 0 auto 40px auto; text-align: center;">
+        <div style="width: 100%; max-width: 500px; margin: 0 auto 40px auto; text-align: center;">
             <div style="height: 15px; background: rgba(139, 149, 165, 0.3); border-radius: 50% / 100% 100% 0 0; box-shadow: 0 -5px 15px rgba(255, 255, 255, 0.05);"></div>
-            <div style="font-size: 10px; color: var(--text-muted, #8b95a5); letter-spacing: 3px; text-transform: uppercase; margin-top: 10px;">Экран</div>
+            <div style="font-size: 11px; color: var(--text-muted, #8b95a5); letter-spacing: 4px; text-transform: uppercase; margin-top: 10px; font-weight: bold;">Экран</div>
         </div>
     `;
 
     const layouts = {
         'atlas_standard': [
-            [0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [0, 1,1,1,1,1,1,1,1, 0,0],
+            [1,1,1,1,1,1,1,1,1,1, 0],
+            [1,1,1,1,1,1,1,1,1,1, 0],
+            [1,1,1,1,1,1,1,1,1,1, 0],
+            [1,1,1,1,1,1,1,1,1,1, 0],
+            [1,1,1,1,1,1,1,1,1,1, 0],
+            [1,1,1,1,1,1,1,1,1,1, 1],
             [0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0]
         ],
         'atlas_zal2': [
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1,1,1,1,1,1,1,1,1,1, 0,0],
+            [1,1,1,1,1,1,1,1,1,1, 0,0],
+            [1,1,1,1,1,1,1,1,1,1, 0,0],
+            [1,1,1,1,1,1,1,1,1,1, 0,0],
+            [1,1,1,1,1,1,1,1,1,1, 0,0],
+            [1,1,1,1,1,1,1,1,1,1, 0,0],
+            [1,1,1,1,1,1,1,1,1,1, 1,1],
             [2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0]
         ],
         'atlas_zal5': [
-            [1, 1, 1, 1, 1, 1, 1, 3, 3, 0, 0],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
-            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1,1,1,1,1,1,1, 3,3, 0,0],
+            [1,1,1,1,1,1,1, 1,1, 0,0],
+            [1,1,1,1,1,1,1, 1,1, 0,0],
+            [1,1,1,1,1,1,1, 1,1, 0,0],
+            [1,1,1,1,1,1,1, 1,1, 0,0],
+            [1,1,1,1,1,1,1, 1,1, 0,0],
+            [1,1,1,1,1,1,1, 1,1, 1,1],
             [0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0]
         ],
         'cinema_park': [
-            [0, 1, 1, 1, 0, 0, 1, 1, 1, 0],
-            [1, 1, 1, 1, 0, 0, 1, 1, 1, 1],
-            [1, 1, 1, 1, 0, 0, 1, 1, 1, 1],
-            [1, 1, 1, 1, 0, 0, 1, 1, 1, 1],
-            [1, 1, 1, 1, 0, 0, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1],
-            [0, 2, 0, 2, 0, 0, 2, 0, 2, 0]
+            [0, 1,1,1, 0,0, 1,1,1, 0],
+            [1,1,1,1, 0,0, 1,1,1,1],
+            [1,1,1,1, 0,0, 1,1,1,1],
+            [1,1,1,1, 0,0, 1,1,1,1],
+            [1,1,1,1, 0,0, 1,1,1,1],
+            [1,1,1,1,1, 0,0, 1,1,1,1,1],
+            [0, 2, 0, 2, 0,0, 2, 0, 2, 0]
         ],
         'standard': [
-            [1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1],
-            [1, 1, 1, 1, 1, 1, 1, 1]
+            [1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,1,1,1],
+            [1,1,1,1,1,1,1,1]
         ]
     };
 
@@ -169,10 +170,10 @@ window.initSeatMap = function (layoutType = 'atlas_standard', cinemaName = 'Ки
             } else {
                 const isOccupied = Math.random() > 0.85;
                 const typeClass = seatType === 1 ? 'standard' : 'vip';
-
+                
                 seat.classList.add(typeClass);
                 if (isOccupied) seat.classList.add('occupied');
-
+                
                 seat.dataset.price = seatType === 1 ? '1900' : '5000';
 
                 if (!isOccupied) {
@@ -238,16 +239,59 @@ window.updateCheckoutMath = function () {
 
 window.currentCinemasData = [];
 
+function buildCinemaCardNode(c) {
+    const card = document.createElement('div');
+    card.className = 'info-card cinema-card';
+    const tagsHtml = c.tags ? c.tags.map(tag => `<span class="tag tag-outline">${tag}</span>`).join('') : '';
+
+    const lowerName = c.name ? c.name.toLowerCase() : '';
+    let hallsHtml = '';
+
+    if (lowerName.includes('atlas') || lowerName.includes('атлас')) {
+        hallsHtml = `
+            <div style="display:flex; gap:8px; margin-top:15px; flex-wrap:wrap;">
+                <button class="btn-outline" style="padding: 6px 12px; font-size:13px;" onclick="window.initSeatMap('atlas_standard', '${c.name} - Зал 1'); document.querySelector('.interactive-map').scrollIntoView({ behavior: 'smooth' });">Зал 1</button>
+                <button class="btn-outline" style="padding: 6px 12px; font-size:13px;" onclick="window.initSeatMap('atlas_zal2', '${c.name} - Зал 2 (Пропасть)'); document.querySelector('.interactive-map').scrollIntoView({ behavior: 'smooth' });">Зал 2</button>
+                <button class="btn-outline" style="padding: 6px 12px; font-size:13px;" onclick="window.initSeatMap('atlas_zal5', '${c.name} - Зал 5 (Богатыри)'); document.querySelector('.interactive-map').scrollIntoView({ behavior: 'smooth' });">Зал 5</button>
+            </div>
+        `;
+    } else {
+        hallsHtml = `
+            <div style="display:flex; gap:8px; margin-top:15px; flex-wrap:wrap;">
+                <button class="btn-outline" style="padding: 6px 12px; font-size:13px;" onclick="window.initSeatMap('cinema_park', '${c.name} - Зал 1'); document.querySelector('.interactive-map').scrollIntoView({ behavior: 'smooth' });">Зал 1</button>
+                <button class="btn-outline" style="padding: 6px 12px; font-size:13px;" onclick="window.initSeatMap('cinema_park', '${c.name} - Зал 2'); document.querySelector('.interactive-map').scrollIntoView({ behavior: 'smooth' });">Зал 2</button>
+            </div>
+        `;
+    }
+
+    card.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+            <div>
+                <h3 style="margin-bottom: 5px;">${c.name}</h3>
+                <p style="color: var(--text-muted); font-size: 13px;">
+                    <i class="fa-solid fa-location-dot"></i> ${c.address}
+                </p>
+            </div>
+            <i class="fa-solid ${c.icon || 'fa-film'}" style="color: var(--accent); font-size: 24px;"></i>
+        </div>
+        <div class="tags">
+            ${tagsHtml}
+        </div>
+        ${hallsHtml}
+    `;
+    return card;
+}
+
 window.updateCinemas = function () {
     const citySelect = document.getElementById('citySelect');
-    const grid = document.getElementById('cinemasGrid');
+    const grid = document.getElementById('cinemasGrid') || document.getElementById('cinemasGridContainer');
 
     if (!citySelect || !grid) return;
 
     const selectedCity = citySelect.value;
     grid.innerHTML = '';
 
-    const sourceData = typeof cinemasData !== 'undefined' ? cinemasData : window.currentCinemasData;
+    const sourceData = typeof cinemasData !== 'undefined' && cinemasData.length > 0 ? cinemasData : window.currentCinemasData;
     const cityCinemas = sourceData.filter(c => c.city === selectedCity || c.city === 'Petropavlovsk');
 
     if (cityCinemas.length === 0) {
@@ -256,58 +300,20 @@ window.updateCinemas = function () {
     }
 
     cityCinemas.forEach(c => {
-        const card = document.createElement('div');
-        card.className = 'info-card cinema-card';
-        const tagsHtml = c.tags ? c.tags.map(tag => `<span class="tag tag-outline">${tag}</span>`).join('') : '';
-
-        let layoutType = 'atlas_standard';
-        const lowerName = c.name ? c.name.toLowerCase() : '';
-
-        if (lowerName.includes('зал 2')) layoutType = 'atlas_zal2';
-        if (lowerName.includes('зал 5')) layoutType = 'atlas_zal5';
-        if (lowerName.includes('cinema park') || lowerName.includes('синема парк')) layoutType = 'cinema_park';
-
-        card.innerHTML = `
-            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px;">
-                <div>
-                    <h3 style="margin-bottom: 5px;">${c.name}</h3>
-                    <p style="color: var(--text-muted); font-size: 13px;">
-                        <i class="fa-solid fa-location-dot"></i> ${c.address}
-                    </p>
-                </div>
-                <i class="fa-solid ${c.icon || 'fa-film'}" style="color: var(--accent); font-size: 24px;"></i>
-            </div>
-            <div class="tags" style="margin-bottom: 20px;">
-                ${tagsHtml}
-            </div>
-            <button class="btn-outline w-100" onclick="window.initSeatMap('${layoutType}', '${c.name}'); document.querySelector('.interactive-map').scrollIntoView({ behavior: 'smooth' });">Выбрать места</button>
-        `;
-
-        grid.appendChild(card);
+        grid.appendChild(buildCinemaCardNode(c));
     });
 };
 
 window.renderCinemasGrid = function (cinemas, cityName) {
-    const grid = document.getElementById('cinemasGridContainer');
+    const grid = document.getElementById('cinemasGridContainer') || document.getElementById('cinemasGrid');
     if (!grid) return;
 
-    if (cinemas.length > 0) {
-        grid.innerHTML = cinemas.map(c => {
-            let layout = 'atlas_standard';
-            const lowerName = c.name ? c.name.toLowerCase() : '';
-            if (lowerName.includes('зал 2')) layout = 'atlas_zal2';
-            if (lowerName.includes('зал 5')) layout = 'atlas_zal5';
-            if (lowerName.includes('cinema park')) layout = 'cinema_park';
+    grid.innerHTML = '';
 
-            return `
-            <div class="info-card cinema-card">
-                <div class="cinema-icon"><i class="fa-solid ${c.icon || 'fa-film'}"></i></div>
-                <h3>${c.name}</h3>
-                <p><i class="fa-solid fa-location-dot"></i> ${c.address}</p>
-                <div class="tags">${c.tags ? c.tags.map(t => `<span>${t}</span>`).join('') : ''}</div>
-                <button class="btn-outline w-100" onclick="window.initSeatMap('${layout}', '${c.name}'); window.showToast('Загружен зал кинотеатра: ${c.name}', 'fa-couch'); document.querySelector('.interactive-map').scrollIntoView({ behavior: 'smooth' });">Выбрать места</button>
-            </div>
-        `}).join('');
+    if (cinemas.length > 0) {
+        cinemas.forEach(c => {
+            grid.appendChild(buildCinemaCardNode(c));
+        });
     } else {
         grid.innerHTML = `
             <div class="info-card" style="grid-column: 1 / -1; text-align: center; padding: 50px 20px;">
@@ -398,13 +404,21 @@ document.addEventListener('DOMContentLoaded', () => {
     window.checkAchievements();
     window.renderMyTickets();
 
+    const waitData = setInterval(() => {
+        if (typeof cinemasData !== 'undefined' && cinemasData.length > 0) {
+            window.updateCinemas();
+            clearInterval(waitData);
+        }
+    }, 200);
+    setTimeout(() => clearInterval(waitData), 5000);
+
     const cinemaSearchInput = document.getElementById('cinemaSearchInput');
     if (cinemaSearchInput) {
         cinemaSearchInput.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase();
-            const sourceData = typeof cinemasData !== 'undefined' ? cinemasData : window.currentCinemasData;
+            const sourceData = typeof cinemasData !== 'undefined' && cinemasData.length > 0 ? cinemasData : window.currentCinemasData;
             const filtered = sourceData.filter(c => c.name.toLowerCase().includes(query));
-            window.renderCinemasGrid(filtered, document.querySelector('.select-selected').textContent);
+            window.renderCinemasGrid(filtered, document.querySelector('.select-selected')?.textContent || '');
         });
     }
 
@@ -414,7 +428,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (checkAuthFlow()) {
                 const cinemasSection = document.querySelector('#cinemas');
                 if (cinemasSection) cinemasSection.scrollIntoView({ behavior: 'smooth' });
-                window.showToast('Выберите кинотеатр для сеанса', 'fa-location-dot');
+                window.updateCinemas();
+                window.showToast('Выберите кинотеатр и зал для сеанса', 'fa-location-dot');
             }
         });
     }
@@ -426,7 +441,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (checkAuthFlow()) {
                 const cinemasSection = document.querySelector('#cinemas');
                 if (cinemasSection) cinemasSection.scrollIntoView({ behavior: 'smooth' });
-                window.showToast('Выберите кинотеатр для сеанса', 'fa-location-dot');
+                window.updateCinemas();
+                window.showToast('Выберите кинотеатр и зал для сеанса', 'fa-location-dot');
             }
         });
     }

@@ -2,28 +2,37 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 const db = require('./database/db');
 const API_KEY = '4f10976f-818f-42b0-87c3-f1c58f949014'; 
-const API_URL = 'https://kinopoiskapiunofficial.tech/api/v2.2/films?order=NUM_VOTE&type=FILM&yearFrom=2024&yearTo=2027&page=1';
 
 async function syncMovies() {
     console.log('🔄 Начинаю загрузку фильмов с Кинопоиска...');
     
     try {
-        const response = await fetch(API_URL, {
-            method: 'GET',
-            headers: {
-                'X-API-KEY': API_KEY,
-                'Content-Type': 'application/json',
-            }
-        });
+        let allMovies = [];
+        for (let page = 1; page <= 5; page++) {
+            const API_URL = `https://kinopoiskapiunofficial.tech/api/v2.2/films?order=NUM_VOTE&type=FILM&yearFrom=2024&yearTo=2027&page=${page}`;
+            
+            console.log(`📡 Загружаю страницу ${page}...`);
+            const response = await fetch(API_URL, {
+                method: 'GET',
+                headers: {
+                    'X-API-KEY': API_KEY,
+                    'Content-Type': 'application/json',
+                }
+            });
 
-        if (!response.ok) {
-            throw new Error(`Ошибка HTTP: ${response.status}`);
+            if (!response.ok) {
+                throw new Error(`Ошибка HTTP на странице ${page}: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data.items && data.items.length > 0) {
+                allMovies = allMovies.concat(data.items);
+            }
         }
 
-        const data = await response.json();
-
-        if (data.items && data.items.length > 0) {
-            console.log(`📥 Получено фильмов из API: ${data.items.length}`);
+        if (allMovies.length > 0) {
+            console.log(`📥 Итого получено фильмов для записи: ${allMovies.length}`);
             
             db.serialize(() => {
                 db.run('DELETE FROM movies', (err) => {
@@ -36,7 +45,7 @@ async function syncMovies() {
                     VALUES (?, ?, ?, ?, ?)
                 `);
 
-                const moviesToSave = data.items.slice(0, 30);
+                const moviesToSave = allMovies.slice(0, 100);
                 
                 moviesToSave.forEach(movie => {
                     const title = movie.nameRu || movie.nameOriginal || 'Без названия';
@@ -46,7 +55,7 @@ async function syncMovies() {
                     const poster = movie.posterUrlPreview || '';
 
                     stmt.run([title, genre, year, rating, poster], (err) => {
-                        if (err) console.error(`❌ Ошибка при добавлении "${title}":`, err.message);
+                        if (err) console.error(`Ошибка при добавлении "${title}":`, err.message);
                     });
                 });
 
@@ -54,12 +63,12 @@ async function syncMovies() {
                     console.log(`Синхронизация успешно завершена! Добавлено фильмов: ${moviesToSave.length}`);
                     db.close((err) => {
                         if (err) console.error('Ошибка при закрытии БД:', err.message);
-                        else console.log('🔌 Соединение с базой данных закрыто.');
+                        else console.log('Соединение с базой данных закрыто.');
                     });
                 });
             });
         } else {
-            console.log('⚠️ Фильмы не найдены в ответе API.');
+            console.log('Фильмы не найдены в ответах API.');
             db.close();
         }
     } catch (error) {

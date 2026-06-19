@@ -1,12 +1,20 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
+@font-face {
+    font-family: 'Montserrat';
+    src: url('../font.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 :root {
     --bg-body: #0b0f19;
     --bg-panel: #151a26;
     --text-main: #ffffff;
     --text-muted: #8b95a5;
     --accent: #00e6a8;
-    --font-main: 'Inter', sans-serif;
+    --font-main: 'Montserrat', sans-serif;
+
     --radius-sm: 8px;
     --radius-md: 16px;
     --radius-lg: 24px;
@@ -85,15 +93,44 @@ img {
     transition: transform var(--transition-speed);
 }
 
-h1 { font-size: 32px; font-weight: 700; line-height: 1.2; }
-h2 { font-size: 24px; font-weight: 600; margin-bottom: 20px; }
-h3 { font-size: 18px; font-weight: 600; margin-bottom: 15px; }
-p { font-size: 14px; color: var(--text-muted); }
+h1 {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.2;
+}
 
-.w-100 { width: 100%; }
-.text-accent { color: var(--accent); }
-.font-semibold { font-weight: 600; }
-.hidden-element { display: none !important; }
+h2 {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+p {
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+.w-100 {
+    width: 100%;
+}
+
+.text-accent {
+    color: var(--accent);
+}
+
+.font-semibold {
+    font-weight: 600;
+}
+
+.hidden-element {
+    display: none !important;
+}
 
 .beta-badge {
     background-color: var(--accent);

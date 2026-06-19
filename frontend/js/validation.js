@@ -91,7 +91,7 @@ function validateContactForm(e) {
     }
 }
 
-function validateRegisterForm(e) {
+async function validateRegisterForm(e) {
     e.preventDefault();
     let isValid = true;
 
@@ -153,16 +153,43 @@ function validateRegisterForm(e) {
             password: passwordInput.value.trim()
         };
 
-        localStorage.setItem('kinoUser', JSON.stringify(userData));
+        try {
+            const submitBtn = document.querySelector('#registerForm .submit-btn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Регистрация...';
+            submitBtn.disabled = true;
 
-        if (window.setLoggedIn) window.setLoggedIn();
-        document.getElementById('authModal').classList.remove('show-modal');
-        if (window.showToast) window.showToast('Аккаунт успешно создан!', 'fa-user-check');
-        document.getElementById('registerForm').reset();
+            const response = await fetch('/api/users/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(userData)
+            });
+
+            const data = await response.json();
+
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+
+            if (response.ok) {
+                if (window.setLoggedIn) window.setLoggedIn();
+                document.getElementById('authModal').classList.remove('show-modal');
+                if (window.showToast) window.showToast('Аккаунт успешно создан!', 'fa-user-check');
+                document.getElementById('registerForm').reset();
+            } else {
+                showError(emailInput, data.error || 'Произошла ошибка при регистрации');
+                if (window.showToast) window.showToast('Ошибка регистрации', 'fa-circle-xmark');
+            }
+
+        } catch (error) {
+            console.error('Ошибка сети:', error);
+            showError(emailInput, 'Ошибка соединения с сервером');
+        }
     }
 }
 
-function validateLoginForm(e) {
+async function validateLoginForm(e) {
     e.preventDefault();
     let isValid = true;
 
@@ -186,24 +213,42 @@ function validateLoginForm(e) {
     }
 
     if (isValid) {
-        const savedUserStr = localStorage.getItem('kinoUser');
+        const loginData = {
+            email: emailInput.value.trim(),
+            password: passwordInput.value.trim()
+        };
 
-        if (savedUserStr) {
-            const savedUser = JSON.parse(savedUserStr);
-            if (savedUser.email === emailInput.value.trim() && savedUser.password === passwordInput.value.trim()) {
+        try {
+            const submitBtn = document.querySelector('#loginForm .submit-btn');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Вход...';
+            submitBtn.disabled = true;
+
+            const response = await fetch('/api/users/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(loginData)
+            });
+
+            const data = await response.json();
+
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+
+            if (response.ok) {
+                localStorage.setItem('kinoUser', JSON.stringify(data.user));
                 if (window.setLoggedIn) window.setLoggedIn();
                 document.getElementById('authModal').classList.remove('show-modal');
                 if (window.showToast) window.showToast('Вы успешно вошли в систему!', 'fa-user-check');
                 document.getElementById('loginForm').reset();
             } else {
-                showError(passwordInput, 'Неверный email или пароль');
+                showError(passwordInput, data.error || 'Ошибка авторизации');
             }
-        } else {
-            showError(emailInput, 'Пользователь не найден. Пожалуйста, зарегистрируйтесь.');
+        } catch (error) {
+            showError(emailInput, 'Ошибка соединения с сервером');
         }
     }
 }
-
 function validateNewsletterForm(e) {
     e.preventDefault();
     let isValid = true;
@@ -238,7 +283,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const registerForm = document.getElementById('registerForm');
     const loginForm = document.getElementById('loginForm');
     const newsletterForm = document.getElementById('newsletterForm');
-    const chatForm = document.getElementById('chatForm');
 
     if (contactForm) {
         contactForm.addEventListener('submit', validateContactForm);
@@ -265,9 +309,5 @@ document.addEventListener('DOMContentLoaded', () => {
     if (newsletterForm) {
         newsletterForm.addEventListener('submit', validateNewsletterForm);
         handleInputEvents(newsletterForm.querySelectorAll('input'));
-    }
-
-    if (chatForm) {
-        chatForm.addEventListener('submit', validateChatForm);
     }
 });

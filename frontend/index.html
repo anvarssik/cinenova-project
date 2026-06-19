@@ -10,11 +10,12 @@
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
     <link rel="stylesheet" href="css/forms.css">
-    <link rel="stylesheet" href="css/style.css">
     <script src="js/ui.js" defer></script>
     <script src="js/api.js" defer></script>
     <script src="js/features.js" defer></script>
     <script src="js/validation.js" defer></script>
+    <script src="js/ai.js" defer></script>
+    <script src="js/ticketCreator.js" defer></script>
 </head>
 
 <body>
@@ -71,6 +72,11 @@
                         style="margin-right: 10px; border-radius: 20px;"><i class="fa-solid fa-ticket"></i> Мои
                         билеты</button>
                     <button class="btn-signin" id="openAuthModal">Sign In | Register</button>
+                    <button id="adminPanelBtn" class="btn-outline hidden-element"
+                        style="border-color: #ff0000; color: #ff0000; margin-right: 10px;"
+                        onclick="window.adminAddMovie()">
+                        <i class="fa-solid fa-crown"></i> Админ
+                    </button>
                 </div>
             </div>
         </div>
@@ -300,71 +306,107 @@
             <div id="collector" class="content-section toggleable-module module-hidden">
                 <button class="close-module-btn"><i class="fa-solid fa-xmark"></i></button>
                 <hr class="section-divider">
-                <h2>AI Collector & Cases</h2>
-                <p class="section-desc">Превратите свои билеты в кино в уникальные произведения искусства, созданные с
-                    помощью искусственного интеллекта. Собирайте и открывайте специальные кейсы.</p>
-                <div class="ai-gallery" id="aiGalleryContainer">
-                    <div class="ai-item">
-                        <img src="img/ai-art1.png" alt="Ticket Art 1">
-                        <div class="ai-item-overlay">Легендарный билет</div>
+                <h2>AI Ticket Creator</h2>
+                <p class="section-desc">Генератор тематических подарочных билетов.</p>
+
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 40px;">
+                    <div class="info-card">
+                        <form id="aiTicketForm" style="display: flex; flex-direction: column; gap: 15px;">
+                            <div class="input-wrapper">
+                                <label style="font-size: 13px; color: var(--text-muted); margin-bottom: 5px; display: block;">Тематика (Например: Киберпанк, Романтика, Марвел)</label>
+                                <input type="text" id="ticketTheme" placeholder="Стиль билета..." required
+                                    style="width: 100%; box-sizing: border-box; background: rgba(139, 149, 165, 0.05); border: 1px solid rgba(139, 149, 165, 0.2); border-radius: var(--radius-sm); padding: 12px 15px; color: var(--text-main); outline: none;">
+                            </div>
+                            <div class="input-wrapper">
+                                <label
+                                    style="font-size: 13px; color: var(--text-muted); margin-bottom: 5px; display: block;">Название
+                                    фильма</label>
+                                <input type="text" id="ticketMovie" placeholder="Например: Дэдпул" required
+                                    style="width: 100%; box-sizing: border-box; background: rgba(139, 149, 165, 0.05); border: 1px solid rgba(139, 149, 165, 0.2); border-radius: var(--radius-sm); padding: 12px 15px; color: var(--text-main); outline: none;">
+                            </div>
+                            <div class="input-wrapper">
+                                <label
+                                    style="font-size: 13px; color: var(--text-muted); margin-bottom: 5px; display: block;">Количество
+                                    билетов (шт.)</label>
+                                <input type="number" id="ticketCount" min="1" max="10" value="1" required
+                                    style="width: 100%; box-sizing: border-box; background: rgba(139, 149, 165, 0.05); border: 1px solid rgba(139, 149, 165, 0.2); border-radius: var(--radius-sm); padding: 12px 15px; color: var(--text-main); outline: none;">
+                            </div>
+                            <button type="submit" class="btn-primary w-100" id="generateTicketBtn"
+                                style="margin-top: 10px;">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Сгенерировать
+                            </button>
+                        </form>
                     </div>
-                    <div class="ai-item">
-                        <img src="img/ai-art2.png" alt="Ticket Art 2">
-                        <div class="ai-item-overlay">Эпический билет</div>
-                    </div>
-                    <div class="ai-item case-unlock action-restricted" data-action="create">
-                        <i class="fa-solid fa-box-open"></i>
-                        <p>Создать больше</p>
+
+                    <div class="info-card"
+                        style="display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(11, 15, 25, 0.5); text-align: center; border: 1px dashed rgba(0, 230, 168, 0.3);">
+                        <i class="fa-solid fa-ticket"
+                            style="font-size: 48px; margin-bottom: 15px; color: var(--accent);"></i>
+                        <h3 style="margin-bottom: 10px;">HD Качество</h3>
+                        <p style="color: var(--text-muted); font-size: 14px;">Билеты будут обрезаны по форме<br>и
+                            скачаются автоматически<br>в формате PNG.</p>
                     </div>
                 </div>
             </div>
 
-            <div id="about" class="content-section toggleable-module module-hidden">
-                <button class="close-module-btn"><i class="fa-solid fa-xmark"></i></button>
-                <hr class="section-divider">
-                <div class="dual-layout">
-                    <div class="about-block">
-                        <h2>About Us</h2>
-                        <p class="section-desc">CineNova - это больше, чем просто кинотеатр. Мы интегрируем
-                            искусственный интеллект, чтобы персонализировать ваш опыт - от поиска идеального фильма до
-                            создания уникальных коллекционных произведений искусства для ваших просмотренных фильмов.
-                        </p>
-                        <ul class="feature-list">
-                            <li><i class="fa-solid fa-check"></i> Next-Gen AI recommendations</li>
-                            <li><i class="fa-solid fa-check"></i> Split-pay система раздельной оплаты для друзей</li>
-                            <li><i class="fa-solid fa-check"></i> Интерактивная карта бронирования</li>
-                        </ul>
-                    </div>
-                    <div id="contact" class="contact-block info-card">
-                        <div class="contact-header-alert">
-                            <h2>Contact Us</h2>
-                            <span class="required-badge"><i class="fa-solid fa-asterisk"></i> Это обязательные
-                                поля</span>
-                        </div>
-                        <form id="contactForm" novalidate>
-                            <div class="input-wrapper">
-                                <input type="text" id="contactName" placeholder="Ваше Имя" required>
-                                <span class="error-text"></span>
-                            </div>
-                            <div class="input-wrapper">
-                                <input type="email" id="contactEmail" placeholder="Ваш Email" required>
-                                <span class="error-text"></span>
-                            </div>
-                            <div class="input-wrapper">
-                                <input type="tel" id="contactPhone" placeholder="Номер телефона" required>
-                                <span class="error-text"></span>
-                            </div>
-                            <div class="input-wrapper">
-                                <textarea id="contactMessage" rows="4" placeholder="Как мы можем помочь?"
-                                    required></textarea>
-                                <span class="error-text"></span>
-                            </div>
-                            <button type="submit" class="btn-primary w-100">Отправить сообщение</button>
-                        </form>
-                    </div>
+            <div class="ai-gallery" id="aiGalleryContainer">
+                <div class="ai-item">
+                    <img src="img/ai-art1.png" alt="Ticket Art 1">
+                    <div class="ai-item-overlay">Легендарный билет</div>
+                </div>
+                <div class="ai-item">
+                    <img src="img/ai-art2.png" alt="Ticket Art 2">
+                    <div class="ai-item-overlay">Эпический билет</div>
                 </div>
             </div>
-        </main>
+    </div>
+
+    <div id="about" class="content-section toggleable-module module-hidden">
+        <button class="close-module-btn"><i class="fa-solid fa-xmark"></i></button>
+        <hr class="section-divider">
+        <div class="dual-layout">
+            <div class="about-block">
+                <h2>About Us</h2>
+                <p class="section-desc">CineNova - это больше, чем просто кинотеатр. Мы интегрируем
+                    искусственный интеллект, чтобы персонализировать ваш опыт - от поиска идеального фильма до
+                    создания уникальных коллекционных произведений искусства для ваших просмотренных фильмов.
+                </p>
+                <ul class="feature-list">
+                    <li><i class="fa-solid fa-check"></i> Next-Gen AI recommendations</li>
+                    <li><i class="fa-solid fa-check"></i> Split-pay система раздельной оплаты для друзей</li>
+                    <li><i class="fa-solid fa-check"></i> Интерактивная карта бронирования</li>
+                </ul>
+            </div>
+            <div id="contact" class="contact-block info-card">
+                <div class="contact-header-alert">
+                    <h2>Contact Us</h2>
+                    <span class="required-badge"><i class="fa-solid fa-asterisk"></i> Это обязательные
+                        поля</span>
+                </div>
+                <form id="contactForm" novalidate>
+                    <div class="input-wrapper">
+                        <input type="text" id="contactName" placeholder="Ваше Имя" required>
+                        <span class="error-text"></span>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="email" id="contactEmail" placeholder="Ваш Email" required>
+                        <span class="error-text"></span>
+                    </div>
+                    <div class="input-wrapper">
+                        <input type="tel" id="contactPhone" placeholder="Номер телефона" required>
+                        <span class="error-text"></span>
+                    </div>
+                    <div class="input-wrapper">
+                        <textarea id="contactMessage" rows="4" placeholder="Как мы можем помочь?" required></textarea>
+                        <span class="error-text"></span>
+                    </div>
+                    <button type="submit" class="btn-primary w-100">Отправить сообщение</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    </main>
     </div>
 
     <footer class="kinoafisha-footer">
@@ -457,17 +499,20 @@
             <h4>CineAI Assistant</h4>
             <button class="close-chat" id="closeChatBtn"><i class="fa-solid fa-xmark"></i></button>
         </div>
-        <div class="chat-messages">
+
+        <div class="chat-messages" id="aiChatMessagesBox" style="height: 300px; overflow-y: auto; padding: 15px;">
             <div class="message ai-message">
-                <p><strong>CineAI:</strong> Привет! Могу ли я порекомендовать что-нибудь в зависимости от вашего
-                    настроения? Попробуйте "Захватывающее, но не страшное".</p>
+                <p><strong>CineAI:</strong> Привет! Я твой ИИ-помощник. Какой фильм ищете?</p>
             </div>
         </div>
-        <div class="chat-input">
-            <form id="chatForm" novalidate style="display:flex; width:100%; align-items:center;">
-                <input type="text" id="chatMessageInput" placeholder="Type a message..." required
-                    style="background:none; border:none; color:inherit; outline:none; padding:5px; width:100%;">
-                <button type="submit" class="send-btn">➤</button>
+
+        <div class="chat-input" style="padding: 10px; border-top: 1px solid rgba(139, 149, 165, 0.2);">
+            <form id="aiChatForm" style="display:flex; width:100%; align-items:center; gap: 10px;">
+                <input type="text" id="aiChatInput" placeholder="Напишите сообщение..." required
+                    style="background:rgba(139, 149, 165, 0.1); border:1px solid rgba(139, 149, 165, 0.2); border-radius: 20px; color:inherit; outline:none; padding:10px 15px; width:100%;">
+                <button type="submit" class="btn-primary" style="padding: 10px 15px; border-radius: 50%;">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
             </form>
         </div>
     </aside>

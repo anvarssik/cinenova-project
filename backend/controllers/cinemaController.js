@@ -18,7 +18,7 @@ const getCinemas = (req, res) => {
             address: c.address,
             city: c.city,
             tags: c.id % 2 === 0 ? ["4DX", "Comfort"] : ["2D", "16+"],
-            icon: c.id % 2 === 0 ? "fa-popcorn" : "fa-film"
+            icon: c.id % 2 === 0 ? "fa-video-camera" : "fa-film"
         }));
 
         res.json(mappedCinemas);

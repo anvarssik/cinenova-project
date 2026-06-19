@@ -1,4 +1,4 @@
-const moviesData = [
+/*const moviesData = [
     { id: 1, title: "Супер Марио: Галактическое кино", genre: "Мультфильм", rating: 6.6, year: 2023, poster: "img/mario-poster-small.png" },
     { id: 2, title: "Холоп 3", genre: "Комедия", rating: 7.2, year: 2024, poster: "img/ai-art1.png" },
     { id: 3, title: "Шрек 5", genre: "Мультфильм", rating: 8.5, year: 2025, poster: "img/ai-art2.png" },
@@ -110,4 +110,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     setTimeout(updateMoviesUI, 100);
-});
+});*/
