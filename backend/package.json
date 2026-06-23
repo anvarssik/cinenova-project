@@ -3,9 +3,7 @@
   "version": "1.0.0",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
-    "seed": "node seed.js",
-    "sync": "node sync.js"
+    "start": "node app.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
