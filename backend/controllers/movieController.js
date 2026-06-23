@@ -18,9 +18,8 @@ const getMovies = (req, res) => {
     }
 
     db.all(query, params, (err, rows) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
+        if (err) return res.status(500).json({ error: err.message });
+
         const mappedRows = rows.map(m => ({
             id: m.id,
             nameRu: m.title,
@@ -36,25 +35,24 @@ const getMovies = (req, res) => {
 const getMovieById = (req, res) => {
     const movieId = parseInt(req.params.id);
     db.get('SELECT * FROM movies WHERE id = ?', [movieId], (err, row) => {
-        if (err) {
-            return res.status(500).json({ error: err.message });
-        }
-        if (!row) {
-            return res.status(404).json({ message: "Фильм с таким ID не найден" });
-        }
-        const mappedMovie = {
-            id: row.id,
-            nameRu: row.title,
-            genres: [{ genre: row.genre }],
-            ratingKinopoisk: row.rating,
-            year: row.release_year,
-            posterUrlPreview: row.poster_url || 'img/mario-poster-small.png'
-        };
-        res.json(mappedMovie);
+        if (err) return res.status(500).json({ error: err.message });
+        if (!row) return res.status(404).json({ message: "Not found" });
+        res.json(row);
     });
 };
 
-module.exports = {
-    getMovies,
-    getMovieById
+const addMovie = (req, res) => {
+    const { title, genre, release_year, rating } = req.body;
+
+    if (!title || !genre) {
+        return res.status(400).json({ error: 'Bad request' });
+    }
+
+    const sql = 'INSERT INTO movies (title, genre, release_year, rating) VALUES (?, ?, ?, ?)';
+    db.run(sql, [title, genre, release_year, rating], function (err) {
+        if (err) return res.status(500).json({ error: err.message });
+        res.status(201).json({ message: 'Фильм успешно добавлен', id: this.lastID });
+    });
 };
+
+module.exports = { getMovies, getMovieById, addMovie };

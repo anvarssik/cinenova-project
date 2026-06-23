@@ -173,7 +173,7 @@ async function validateRegisterForm(e) {
             submitBtn.disabled = false;
 
             if (response.ok) {
-                if (window.setLoggedIn) window.setLoggedIn();
+                if (window.setLoggedIn) window.setLoggedIn(data.user.role === 'admin');
                 document.getElementById('authModal').classList.remove('show-modal');
                 if (window.showToast) window.showToast('Аккаунт успешно создан!', 'fa-user-check');
                 document.getElementById('registerForm').reset();

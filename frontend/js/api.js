@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadPremieres();
     loadMovieBuddies();
     loadCinemas();
+    console.log("Список команд: window.testAddMovie()");
 });
 
 async function loadCinemas() {
@@ -165,6 +166,11 @@ function renderMovies(movies) {
             document.getElementById('modalMovieMeta').textContent = `${metaText} | Рейтинг: ${movie.ratingKinopoisk || 'N/A'}`;
             window.selectedMovieTitle = titleText;
             document.getElementById('checkoutMovieTitle').textContent = titleText;
+
+            if (typeof window.renderMovieSessions === 'function') {
+                window.renderMovieSessions(movie.id);
+            }
+
             modal.classList.add('show-modal');
         });
 
@@ -215,27 +221,54 @@ function renderBuddies(users) {
     grid.innerHTML = '';
 
     users.forEach(user => {
+        const currentUser = JSON.parse(localStorage.getItem('kinoUser'));
+        if (currentUser && currentUser.id === user.id) return;
+
         const card = document.createElement('div');
         card.className = 'info-card buddy-card';
 
+        const avatar = user.avatar_url || 'img/avatar1.png';
+        const name = user.login || 'Аноним';
+        const age = 18 + (user.id % 10);
+        const match = 75 + (user.id % 21);
+        const movies = ['Супер Марио', 'Шрек 5', 'Холоп 3', 'Дюна: Часть третья'];
+        const wantsToSee = movies[user.id % movies.length];
+
         card.innerHTML = `
             <div class="buddy-header">
-                <img src="${user.avatar}" alt="${user.name}">
+                <img src="${avatar}" alt="${name}">
                 <div>
-                    <h3>${user.name}, ${user.age}</h3>
-                    <span class="match-rate"><i class="fa-solid fa-fire"></i> Совпадение на ${user.match}%</span>
+                    <h3>${name}, ${age}</h3>
+                    <span class="match-rate"><i class="fa-solid fa-fire"></i> Совпадение на ${match}%</span>
                 </div>
             </div>
-            <p>Wants to see: <strong>${user.wantsToSee}</strong></p>
-            <button class="btn-primary w-100 action-restricted" data-action="invite">Send Invite</button>
+            <p>Wants to see: <strong>${wantsToSee}</strong></p>
+            <button class="btn-primary w-100 action-restricted" data-action="invite">Отправить заявку</button>
         `;
 
         const inviteBtn = card.querySelector('button');
-        inviteBtn.addEventListener('click', (e) => {
+        inviteBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             if (typeof checkAuthFlow === 'function' && checkAuthFlow()) {
-                if (window.showToast) window.showToast('Инвайт успешно отправлен!', 'fa-paper-plane');
-                if (window.unlockAchievement) window.unlockAchievement('ach2', 'Душа компании', 'fa-users');
+                if (!currentUser || !currentUser.id) return; // Защита от отправки NULL
+
+                try {
+                    const res = await fetch('/api/users/invite', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ from_user: currentUser.id, to_user: user.id })
+                    });
+
+                    if (res.ok) {
+                        if (window.showToast) window.showToast(`Заявка отправлена пользователю ${name}!`, 'fa-paper-plane');
+                        if (window.unlockAchievement) window.unlockAchievement('ach2', 'Душа компании', 'fa-users');
+                    } else {
+                        const errorData = await res.json();
+                        if (window.showToast) window.showToast(errorData.error || 'Ошибка', 'fa-info-circle');
+                    }
+                } catch (err) {
+                    console.error('Ошибка сети:', err);
+                }
             }
         });
 

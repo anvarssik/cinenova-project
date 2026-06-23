@@ -1,20 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-@font-face {
-    font-family: 'Montserrat';
-    src: url('../font.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
 :root {
     --bg-body: #0b0f19;
     --bg-panel: #151a26;
     --text-main: #ffffff;
     --text-muted: #8b95a5;
     --accent: #00e6a8;
-    --font-main: 'Montserrat', sans-serif;
-
+    --font-main: 'Inter', sans-serif;
     --radius-sm: 8px;
     --radius-md: 16px;
     --radius-lg: 24px;
@@ -22,10 +14,11 @@
 }
 
 body.light-theme {
-    --bg-body: #f4f6f8;
-    --bg-panel: #cfcfcf;
-    --text-main: #111827;
-    --text-muted: #6b7280;
+    --bg-main: #f4f6f9;
+    --bg-panel: #ffffff;
+    --text-main: #1a1a1a;
+    --text-muted: #5a6270;
+    --accent: #00b383;
 }
 
 ::-webkit-scrollbar {
@@ -142,4 +135,11 @@ p {
     margin-left: 6px;
     vertical-align: super;
     text-transform: uppercase;
+}
+
+.footer-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    padding: 40px 0;
 }

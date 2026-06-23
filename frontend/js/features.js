@@ -8,17 +8,19 @@ function updateAuthUI() {
     const authBtn = document.getElementById('openAuthModal');
     const myTicketsBtn = document.getElementById('myTicketsBtn');
     const adminPanelBtn = document.getElementById('adminPanelBtn');
-
+    const profileLink = document.getElementById('navProfileLink');
     if (authBtn) {
         if (isLoggedIn) {
             authBtn.textContent = 'Выход';
             if (myTicketsBtn) myTicketsBtn.classList.remove('hidden-element');
+            if (profileLink) profileLink.classList.remove('hidden-element');
             if (isAdmin && adminPanelBtn) adminPanelBtn.classList.remove('hidden-element');
 
             authBtn.onclick = (e) => {
                 e.preventDefault();
                 window.setLoggedOut();
             };
+            window.checkAchievements();
         } else {
             authBtn.textContent = 'Sign In | Register';
             if (myTicketsBtn) myTicketsBtn.classList.add('hidden-element');
@@ -28,6 +30,7 @@ function updateAuthUI() {
                 e.preventDefault();
                 document.getElementById('authModal').classList.add('show-modal');
             };
+            window.checkAchievements();
         }
     }
 }
@@ -51,10 +54,10 @@ window.setLoggedIn = function (adminFlag = false) {
 window.setLoggedOut = function () {
     isLoggedIn = false;
     isAdmin = false;
-    localStorage.removeItem('isLoggedIn');
-    localStorage.removeItem('isAdmin');
+    localStorage.clear();
     updateAuthUI();
-    if (window.showToast) window.showToast('Вы вышли из системы', 'fa-sign-out-alt');
+    if (window.showToast) window.showToast('Вы вышли из системы. Очистка сессии...', 'fa-sign-out-alt');
+    setTimeout(() => location.reload(), 800);
 };
 
 window.initSeatMap = function (layoutType = 'atlas_standard', cinemaName = 'Кинотеатр не выбран') {
@@ -98,48 +101,48 @@ window.initSeatMap = function (layoutType = 'atlas_standard', cinemaName = 'Ки
 
     const layouts = {
         'atlas_standard': [
-            [0, 1,1,1,1,1,1,1,1, 0,0],
-            [1,1,1,1,1,1,1,1,1,1, 0],
-            [1,1,1,1,1,1,1,1,1,1, 0],
-            [1,1,1,1,1,1,1,1,1,1, 0],
-            [1,1,1,1,1,1,1,1,1,1, 0],
-            [1,1,1,1,1,1,1,1,1,1, 0],
-            [1,1,1,1,1,1,1,1,1,1, 1],
+            [0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0]
         ],
         'atlas_zal2': [
-            [1,1,1,1,1,1,1,1,1,1, 0,0],
-            [1,1,1,1,1,1,1,1,1,1, 0,0],
-            [1,1,1,1,1,1,1,1,1,1, 0,0],
-            [1,1,1,1,1,1,1,1,1,1, 0,0],
-            [1,1,1,1,1,1,1,1,1,1, 0,0],
-            [1,1,1,1,1,1,1,1,1,1, 0,0],
-            [1,1,1,1,1,1,1,1,1,1, 1,1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [2, 0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0]
         ],
         'atlas_zal5': [
-            [1,1,1,1,1,1,1, 3,3, 0,0],
-            [1,1,1,1,1,1,1, 1,1, 0,0],
-            [1,1,1,1,1,1,1, 1,1, 0,0],
-            [1,1,1,1,1,1,1, 1,1, 0,0],
-            [1,1,1,1,1,1,1, 1,1, 0,0],
-            [1,1,1,1,1,1,1, 1,1, 0,0],
-            [1,1,1,1,1,1,1, 1,1, 1,1],
+            [1, 1, 1, 1, 1, 1, 1, 3, 3, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
             [0, 2, 0, 2, 0, 2, 0, 2, 0, 2, 0]
         ],
         'cinema_park': [
-            [0, 1,1,1, 0,0, 1,1,1, 0],
-            [1,1,1,1, 0,0, 1,1,1,1],
-            [1,1,1,1, 0,0, 1,1,1,1],
-            [1,1,1,1, 0,0, 1,1,1,1],
-            [1,1,1,1, 0,0, 1,1,1,1],
-            [1,1,1,1,1, 0,0, 1,1,1,1,1],
-            [0, 2, 0, 2, 0,0, 2, 0, 2, 0]
+            [0, 1, 1, 1, 0, 0, 1, 1, 1, 0],
+            [1, 1, 1, 1, 0, 0, 1, 1, 1, 1],
+            [1, 1, 1, 1, 0, 0, 1, 1, 1, 1],
+            [1, 1, 1, 1, 0, 0, 1, 1, 1, 1],
+            [1, 1, 1, 1, 0, 0, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1],
+            [0, 2, 0, 2, 0, 0, 2, 0, 2, 0]
         ],
         'standard': [
-            [1,1,1,1,1,1,1,1],
-            [1,1,1,1,1,1,1,1],
-            [1,1,1,1,1,1,1,1]
+            [1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1]
         ]
     };
 
@@ -170,10 +173,10 @@ window.initSeatMap = function (layoutType = 'atlas_standard', cinemaName = 'Ки
             } else {
                 const isOccupied = Math.random() > 0.85;
                 const typeClass = seatType === 1 ? 'standard' : 'vip';
-                
+
                 seat.classList.add(typeClass);
                 if (isOccupied) seat.classList.add('occupied');
-                
+
                 seat.dataset.price = seatType === 1 ? '1900' : '5000';
 
                 if (!isOccupied) {
@@ -282,17 +285,17 @@ function buildCinemaCardNode(c) {
     return card;
 }
 
-window.updateCinemas = function () {
+window.updateCinemas = function (cityName) {
     const citySelect = document.getElementById('citySelect');
     const grid = document.getElementById('cinemasGrid') || document.getElementById('cinemasGridContainer');
 
     if (!citySelect || !grid) return;
 
-    const selectedCity = citySelect.value;
+    const selectedCity = cityName || citySelect.querySelector('.select-selected').textContent.trim();
     grid.innerHTML = '';
 
     const sourceData = typeof cinemasData !== 'undefined' && cinemasData.length > 0 ? cinemasData : window.currentCinemasData;
-    const cityCinemas = sourceData.filter(c => c.city === selectedCity || c.city === 'Petropavlovsk');
+    const cityCinemas = sourceData.filter(c => c.city === selectedCity);
 
     if (cityCinemas.length === 0) {
         grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">В этом городе пока нет доступных кинотеатров.</p>';
@@ -325,29 +328,55 @@ window.renderCinemasGrid = function (cinemas, cityName) {
     }
 }
 
-window.unlockAchievement = function (id, title, icon) {
-    const unlocked = JSON.parse(localStorage.getItem('userAchievements')) || [];
-    if (!unlocked.includes(id)) {
-        unlocked.push(id);
-        localStorage.setItem('userAchievements', JSON.stringify(unlocked));
+window.unlockAchievement = async function (achCode, title, icon) {
+    const currentUser = JSON.parse(localStorage.getItem('kinoUser'));
+    if (!currentUser || !currentUser.id) return;
 
-        if (window.showToast) {
-            window.showToast(`🏆 Открыта новая ачивка: ${title}!`, icon);
+    const achElement = document.getElementById(achCode);
+    if (achElement && achElement.classList.contains('ach-unlocked')) return;
+
+    const achId = parseInt(achCode.replace('ach', ''));
+    try {
+        const response = await fetch('/api/users/achievements', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: currentUser.id, achievement_id: achId })
+        });
+        if (response.ok) {
+            if (window.showToast) window.showToast(`🏆 Открыта ачивка: ${title}!`, icon);
+            window.checkAchievements();
         }
-        window.checkAchievements();
-    }
+    } catch (error) { }
 };
 
-window.checkAchievements = function () {
-    const unlocked = JSON.parse(localStorage.getItem('userAchievements')) || [];
+window.checkAchievements = async function () {
     const achs = ['ach1', 'ach2', 'ach3'];
     achs.forEach(id => {
         const el = document.getElementById(id);
-        if (el && unlocked.includes(id)) {
-            el.classList.remove('ach-locked');
-            el.classList.add('ach-unlocked');
+        if (el) {
+            el.classList.remove('ach-unlocked');
+            el.classList.add('ach-locked');
         }
     });
+
+    const currentUser = JSON.parse(localStorage.getItem('kinoUser'));
+    if (!currentUser || !currentUser.id) return;
+
+    try {
+        const response = await fetch(`/api/users/${currentUser.id}/achievements`);
+        if (!response.ok) return;
+        const achievements = await response.json();
+
+        achievements.forEach(ach => {
+            const el = document.getElementById(`ach${ach.id}`);
+            if (el) {
+                el.classList.remove('ach-locked');
+                el.classList.add('ach-unlocked');
+            }
+        });
+    } catch (error) {
+        console.error('Ошибка загрузки ачивок из БД:', error);
+    }
 };
 
 window.renderMyTickets = function () {
@@ -501,28 +530,57 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const finalPayBtn = document.getElementById('finalPayBtn');
     if (finalPayBtn) {
-        finalPayBtn.addEventListener('click', () => {
+        finalPayBtn.addEventListener('click', async () => {
             const seats = document.querySelectorAll('.seat.selected');
             if (seats.length === 0) return;
 
-            const ticketCount = seats.length;
-            const tDate = new Date().toLocaleString();
-            let myTickets = JSON.parse(localStorage.getItem('myTickets')) || [];
+            const currentUser = JSON.parse(localStorage.getItem('kinoUser'));
+            if (!currentUser || !currentUser.id) {
+                if (window.showToast) window.showToast('Пожалуйста, войдите в аккаунт перед покупкой!', 'fa-lock');
+                document.getElementById('authModal').classList.add('show-modal');
+                return;
+            }
 
-            myTickets.push({ count: ticketCount, date: tDate, movie: window.selectedMovieTitle });
-            localStorage.setItem('myTickets', JSON.stringify(myTickets));
+            const ticketsToBuy = Array.from(seats).map((s, index) => ({
+                seat: index + 10,
+                movie: window.selectedMovieTitle
+            }));
 
-            window.unlockAchievement('ach1', 'Первый ряд', 'fa-ticket');
+            try {
+                const originalText = finalPayBtn.textContent;
+                finalPayBtn.textContent = 'Обработка транзакции...';
+                finalPayBtn.disabled = true;
 
-            seats.forEach(s => {
-                s.classList.remove('selected');
-                s.classList.replace('available', 'occupied');
-            });
+                const response = await fetch('/api/tickets/buy', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: currentUser.id,
+                        session_id: window.selectedSessionId || 1,
+                        tickets: ticketsToBuy
+                    })
+                });
 
-            document.getElementById('receiptIdBox').textContent = 'ID: #' + Math.floor(Math.random() * 90000 + 10000);
-            window.updateCheckoutMath();
-            window.renderMyTickets();
-            if (window.showToast) window.showToast('Оплата успешно проведена!', 'fa-check-circle');
+                finalPayBtn.textContent = originalText;
+                finalPayBtn.disabled = false;
+
+                if (response.ok) {
+                    window.unlockAchievement('ach1', 'Первый ряд', 'fa-ticket');
+
+                    seats.forEach(s => {
+                        s.classList.remove('selected');
+                        s.classList.add('occupied');
+                    });
+
+                    document.getElementById('receiptIdBox').textContent = 'ID: #' + Math.floor(Math.random() * 90000 + 10000);
+                    window.updateCheckoutMath();
+                    if (window.showToast) window.showToast('Оплата проведена, билеты в БД!', 'fa-check-circle');
+                }
+            } catch (error) {
+                console.error('Ошибка покупки:', error);
+                if (window.showToast) window.showToast('Ошибка сервера при оплате', 'fa-times-circle');
+                finalPayBtn.disabled = false;
+            }
         });
     }
 
@@ -542,3 +600,179 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+async function loadSplitPayFriends() {
+    const currentUser = JSON.parse(localStorage.getItem('kinoUser'));
+    const container = document.querySelector('.buddy-selector-group');
+    if (!currentUser || !container) return;
+
+    try {
+        const response = await fetch(`/api/users/${currentUser.id}/friends`);
+        const friends = await response.json();
+
+        container.innerHTML = '';
+        const acceptedFriends = friends.filter(f => f.status === 'accepted');
+
+        if (acceptedFriends.length === 0) {
+            container.innerHTML = '<p style="color:var(--text-muted);font-size:14px;">У вас пока нет друзей для совместной оплаты.</p>';
+            return;
+        }
+
+        acceptedFriends.forEach(f => {
+            container.innerHTML += `
+                <div class="buddy-select-item">
+                    <input type="checkbox" id="buddy-${f.id}">
+                    <label for="buddy-${f.id}">
+                        <img src="${f.avatar_url}" alt="${f.login}">
+                        <div class="buddy-meta">
+                            <span>${f.login}</span>
+                            <small>Готов скинуться</small>
+                        </div>
+                    </label>
+                </div>
+            `;
+        });
+
+        document.querySelectorAll('.buddy-select-item input').forEach(cb => {
+            cb.addEventListener('change', window.updateCheckoutMath);
+        });
+
+    } catch (error) { }
+}
+
+async function fetchDynamicWeatherPricing() {
+    try {
+        const response = await fetch('https://api.open-meteo.com/v1/forecast?latitude=54.87&longitude=69.13&current_weather=true');
+        const data = await response.json();
+        const temp = data.current_weather.temperature;
+
+        if (temp <= -25) {
+            window.currentPromoDiscount = 0.15;
+            if (window.showToast) window.showToast(`На улице ${temp}°C. Включена морозная скидка 15% и вызов InDrive!`, 'fa-snowflake');
+            window.updateCheckoutMath();
+
+            const btnContainer = document.querySelector('.payment-methods');
+            if (btnContainer && !document.getElementById('indriveBtn')) {
+                const taxiBtn = document.createElement('button');
+                taxiBtn.id = 'indriveBtn';
+                taxiBtn.className = 'btn-outline w-100';
+                taxiBtn.style.marginTop = '10px';
+                taxiBtn.style.borderColor = '#b3ff00';
+                taxiBtn.style.color = '#b3ff00';
+                taxiBtn.innerHTML = '<i class="fa-solid fa-car"></i> Вызвать InDrive ко входу';
+                btnContainer.appendChild(taxiBtn);
+            }
+        }
+    } catch (error) { }
+}
+
+async function renderMovieSessions(movieId) {
+    try {
+        const response = await fetch(`/api/sessions/${movieId}`);
+        const sessions = await response.json();
+
+        const modalDesc = document.getElementById('modalMovieDesc');
+        let sessionsHtml = '<div class="sessions-badges" style="display:flex; gap:10px; flex-wrap:wrap; margin-top:15px;">';
+
+        sessions.forEach(s => {
+            sessionsHtml += `<button class="btn-outline session-time-btn" data-id="${s.id}" data-time="${s.show_time}" style="padding: 5px 10px; font-size:13px;">${s.show_time}</button>`;
+        });
+        sessionsHtml += '</div><div id="aiSnackSuggestion" style="margin-top:15px; font-size:13px; color:var(--accent);"></div>';
+
+        modalDesc.innerHTML = 'Выберите время сеанса:' + sessionsHtml;
+
+        document.querySelectorAll('.session-time-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.session-time-btn').forEach(b => b.style.background = 'transparent');
+                this.style.background = 'var(--accent)';
+                this.style.color = '#000';
+                window.selectedSessionId = this.getAttribute('data-id');
+
+                const timeStr = this.getAttribute('data-time');
+                const hour = parseInt(timeStr.split(':')[0]);
+                const snackBox = document.getElementById('aiSnackSuggestion');
+
+                if (hour < 12) {
+                    snackBox.innerHTML = '<i class="fa-solid fa-robot"></i> CineAI: На утренний сеанс предлагаю свежий сок и сладкий попкорн со скидкой 10%!';
+                } else if (hour > 18) {
+                    snackBox.innerHTML = '<i class="fa-solid fa-robot"></i> CineAI: К вечернему просмотру отлично подойдут начос с острым соусом и кола!';
+                } else {
+                    snackBox.innerHTML = '<i class="fa-solid fa-robot"></i> CineAI: Добавьте стандартное комбо в заказ.';
+                }
+            });
+        });
+    } catch (e) { }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('split-pay-hub')) {
+        document.querySelector('a[data-id="split-pay-hub"]').addEventListener('click', loadSplitPayFriends);
+    }
+    fetchDynamicWeatherPricing();
+});
+
+window.swipeMovie = function (liked) {
+    if (liked) {
+        if (window.showToast) window.showToast('Мэтч! Ваш друг Александр тоже хочет пойти на этот фильм.', 'fa-heart');
+        document.getElementById('swipeRadar').style.display = 'none';
+
+        const splitPayHub = document.getElementById('split-pay-hub');
+        if (splitPayHub) {
+            splitPayHub.classList.remove('module-hidden');
+            splitPayHub.scrollIntoView({ behavior: 'smooth' });
+        }
+    } else {
+        document.getElementById('radarTitle').textContent = "Дюна: Часть третья";
+        document.getElementById('radarPoster').src = "movie-tesha.png";
+        document.getElementById('radarPoster').src = "movie-holop.png";
+        document.getElementById('radarPoster').src = "movie-shreak5.png.png";
+        document.getElementById('radarPoster').src = "movie-kuzya.png";
+        document.getElementById('radarPoster').src = "movie-scarymovie.png";
+        document.getElementById('radarPoster').src = "movie-lida.png";
+        document.getElementById('radarPoster').src = "movie-point.png";
+        document.getElementById('radarPoster').src = "movie-raspakovka.png";
+        document.getElementById('swipeRadar').style.display = 'none';
+    }
+};
+
+window.swipeMovie = function (liked) {
+    if (liked) {
+        if (window.showToast) window.showToast('Мэтч! Ваш друг тоже хочет пойти на этот фильм.', 'fa-heart');
+        document.getElementById('swipeRadar').style.display = 'none';
+
+        const splitPayHub = document.getElementById('split-pay-hub');
+        if (splitPayHub) {
+            splitPayHub.classList.remove('module-hidden');
+            splitPayHub.scrollIntoView({ behavior: 'smooth' });
+        }
+    } else {
+        document.getElementById('radarTitle').textContent = "Дюна: Часть третья";
+        document.getElementById('radarPoster').src = "img/achivment (2).png";
+    }
+};
+
+
+
+window.testAddMovie = async function () {
+    const user = JSON.parse(localStorage.getItem('kinoUser'));
+    if (!user) return alert('Сначала войдите в аккаунт!');
+
+    try {
+        const response = await fetch('/api/movies', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-user-email': user.email
+            },
+            body: JSON.stringify({ title: 'Тестовый фильм', genre: 'Боевик', release_year: 2026, rating: 10 })
+        });
+
+        if (response.ok) {
+            if (window.showToast) window.showToast('Успех! Сервер разрешил добавить фильм.', 'fa-check');
+        } else if (response.status === 403) {
+            alert('ОШИБКА 403: СЕРВЕР ЗАБЛОКИРОВАЛ ЗАПРОС! У вас нет прав.');
+        }
+    } catch (error) {
+        console.error(error);
+    }
+};

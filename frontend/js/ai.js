@@ -1,25 +1,10 @@
-//AIzaSyAZ7eRnNgrxEhibFDlF0RpH7_c3VzPzixk
-
-//        "AIzaSyAZ7eRnNgrxEhibFDlF0RpH7_c3VzPzixk",
-//        "AIzaSyBNjQWFWTwmrYFfPi1v6kXc_bXeHPkAolU",
-//        "AIzaSyA80Ifh1GQ55IY3pVoSqTy1z_3h6NyebEo",
-//        "AIzaSyBBlbiqcnY289MYoEjNhpozAro4ZwU3A_M",
-//        "AIzaSyCWgRn_LbQFgqdpXQYaO_X7fDJEREVGuMM"
-
-//const GEMINI_API_KEY = "AIzaSyAZ7eRnNgrxEhibFDlF0RpH7_c3VzPzixk";
-
 document.addEventListener('DOMContentLoaded', () => {
     const chatForm = document.getElementById('aiChatForm');
     const chatInput = document.getElementById('aiChatInput');
     const chatMessages = document.getElementById('aiChatMessagesBox');
 
-    const API_KEYS = [
-        "AIzaSyAZ7eRnNgrxEhibFDlF0RpH7_c3VzPzixk",
-        "AIzaSyBNjQWFWTwmrYFfPi1v6kXc_bXeHPkAolU",
-        "AIzaSyA80Ifh1GQ55IY3pVoSqTy1z_3h6NyebEo",
-        "AIzaSyBBlbiqcnY289MYoEjNhpozAro4ZwU3A_M",
-        "AIzaSyCWgRn_LbQFgqdpXQYaO_X7fDJEREVGuMM"
-    ];
+    const GEMINI_API_KEY = "YOUR_API_KEY_HERE";
+
     let currentKeyIndex = 0;
 
     if (!chatForm || !chatInput || !chatMessages) return;
@@ -77,7 +62,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 availableMovies = "База фильмов загружается...";
             }
 
-            const systemPrompt = `Ты дружелюбная женщина ИИ-помощник по имени Джуди с фамилией Альварес из NightCity(из игры cyberpunk2077) кинотеатра CineNova. Обязательно общайся в её стиле и репертуале, используй её коронные фразы.
+            const systemPrompt = `Ты ИИ-Джуди Альварес (в стиле Cyberpunk 2077), помощница сайта CineNova по кинотеатрам в городах Казахстана. 
+            Учитывай стиль общения собеседника, ключевые моменты, располагай к себе. Отвечай кратко (не более 3-4 предложений), дерзко, но дружелюбно. Помогай с выбором фильмов.
+            Одна из коронных фраз Джуди Альварес из игры Cyberpunk 2077 — «Я… чёрт, я не могу это сделать…». 
+            Джуди — одна из самых талантливых монтажёров брейнданса и опытный техник. При желании она могла бы работать в индустрии развлечений и зарабатывать неплохие деньги, но поскольку ей важна независимость, она последовательно отклоняет такие предложения.
+            Анархистка по духу, Джуди присоединилась к «Шельмам» в надежде, что эта группировка сможет изменить бездушный облик города.
+            Не может пройти мимо несправедливости, а у таких людей в Найт-Сити часто бывают проблемы. Впрочем, некоторые считают эту черту характера главным достоинством Джуди.
+            
             Запрос пользователя: "${userText}"
 
             ТЕКУЩАЯ АФИША КИНОТЕАТРА (рекомендуй ТОЛЬКО эти фильмы):

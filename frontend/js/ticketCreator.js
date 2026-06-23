@@ -1,4 +1,4 @@
-const GEMINI_API_KEY = "AIzaSyBBlbiqcnY289MYoEjNhpozAro4ZwU3A_M";
+const GEMINI_API_KEY = "YOUR_API_KEY_HERE";
 
 document.addEventListener('DOMContentLoaded', () => {
     const ticketForm = document.getElementById('aiTicketForm');
@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const btn = document.getElementById('generateTicketBtn');
             const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Подготовка дизайна...';
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Рисуем нейро-билет...';
             btn.disabled = true;
 
             await generateAITicket(theme, movie, count);
@@ -39,18 +39,19 @@ async function translatePrompt(text) {
     }
 }
 
-// Теперь Gemini отдает только меткие ключевые слова для поиска картинок
-async function enhancePromptWithGemini(userIdea) {
+// Gemini как строгий Промпт-Инженер
+async function generateImagePromptWithGemini(userIdea) {
     const englishIdea = await translatePrompt(userIdea);
-    const fallbackKeywords = "abstract,cinema";
+    const fallbackPrompt = "cinematic background, abstract dark shapes, beautiful lighting, 8k resolution, empty center";
 
     if (!GEMINI_API_KEY || GEMINI_API_KEY === "ТВОЙ_КЛЮЧ_ЗДЕСЬ") {
-        return fallbackKeywords;
+        return fallbackPrompt;
     }
 
     try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-        const systemPrompt = `Extract 2 or 3 single English keywords describing the core visual theme of this idea: "${englishIdea}". Return ONLY the keywords separated by a comma, no spaces. Example: cyberpunk,neon`;
+        // СТРОГОЕ УКАЗАНИЕ: Максимум 40 слов, одно предложение, никаких переносов строк.
+        const systemPrompt = `You are an expert AI image prompt engineer. Create a highly detailed but CONCISE prompt (MAX 40 WORDS, ONE SINGLE SENTENCE) for an image generator based on this idea: "${englishIdea}". The image will be used as a background for a cinematic movie ticket. Focus on atmosphere, cinematic lighting, and style. NO text, NO letters, NO watermarks. DO NOT use line breaks or paragraphs. Return ONLY the prompt text.`;
 
         const response = await fetch(url, {
             method: 'POST',
@@ -60,13 +61,18 @@ async function enhancePromptWithGemini(userIdea) {
             })
         });
 
-        if (!response.ok) return fallbackKeywords;
+        if (!response.ok) return fallbackPrompt;
 
         const data = await response.json();
-        return encodeURIComponent(data.candidates[0].content.parts[0].text.trim().toLowerCase());
+        let promptText = data.candidates[0].content.parts[0].text.trim();
+        
+        // ОЧИСТКА: Удаляем любые случайные переносы строк (\n) и лишние пробелы, чтобы не ломать URL
+        promptText = promptText.replace(/\n|\r/g, ' ').replace(/\s+/g, ' ');
+        
+        return promptText;
 
     } catch (error) {
-        return fallbackKeywords;
+        return fallbackPrompt;
     }
 }
 
@@ -77,42 +83,52 @@ async function generateAITicket(themePrompt, movieName, quantity) {
     canvas.width = 800;
     canvas.height = 300;
 
-    // Получаем ключевые слова (например: love,hearts)
-    const keywords = await enhancePromptWithGemini(themePrompt);
+    // 1. Получаем чистый и емкий промпт от Gemini
+    const detailedPrompt = await generateImagePromptWithGemini(themePrompt);
+    const cacheBuster = Date.now();
 
-    // Каскад источников без защиты Cloudflare, полностью поддерживающих Canvas
+    // Для резервного абстрактного фона берем только первые 50 символов, чтобы не перегружать ссылку
+    const shortSeed = encodeURIComponent(detailedPrompt.substring(0, 50));
+
+    // 2. Бронебойный КАСКАД источников
     const imageSources = [
-        `https://loremflickr.com/800/300/${keywords},pattern/all`, // 1. Картинка по ключевым словам
-        `https://api.dicebear.com/9.x/glass/png?seed=${keywords}&width=800&height=300`, // 2. Резерв: стильная генеративная 3D-абстракция
-        `https://picsum.photos/seed/${keywords}/800/300?blur=2` // 3. Крайний резерв: размытое фото
+        `https://image.pollinations.ai/prompt/${encodeURIComponent(detailedPrompt)}?width=800&height=300&nologo=true&seed=${cacheBuster}`,
+        `https://api.dicebear.com/9.x/glass/png?seed=${shortSeed}-${cacheBuster}&width=800&height=300`
     ];
 
     let imageLoaded = false;
     const image = new Image();
     image.crossOrigin = "Anonymous";
 
-    // Пытаемся загрузить картинки по очереди
+    // 3. Пытаемся загрузить картинки по очереди
     for (const imgUrl of imageSources) {
         try {
             await new Promise((resolve, reject) => {
-                const timeout = setTimeout(() => reject(new Error("Timeout")), 6000);
+                const timeout = setTimeout(() => reject(new Error("Timeout")), 15000); 
+                
                 image.onload = () => {
                     clearTimeout(timeout);
                     imageLoaded = true;
                     resolve();
                 };
+                
                 image.onerror = () => {
                     clearTimeout(timeout);
                     reject(new Error("Load Error"));
                 };
+                
                 image.src = imgUrl;
             });
-            if (imageLoaded) break; // Успех, картинка загружена!
+            
+            if (imageLoaded) break; // Успех! Выходим из цикла.
+            
         } catch (e) {
-            imageLoaded = false; // Идем к следующей ссылке из массива
+            console.warn("Источник недоступен, переключаемся на резервный...");
+            imageLoaded = false; 
         }
     }
 
+    // 4. Отрисовка билета
     try {
         for (let i = 0; i < quantity; i++) {
             ctx.clearRect(0, 0, 800, 300);
@@ -147,7 +163,7 @@ async function generateAITicket(themePrompt, movieName, quantity) {
                 ctx.fillRect(0, 0, 800, 300);
             }
 
-            // ЗАТЕМНЕНИЕ (чтобы текст читался на любом фоне)
+            // ЗАТЕМНЕНИЕ
             const overlayGrad = ctx.createLinearGradient(0, 0, 800, 0);
             overlayGrad.addColorStop(0, "rgba(11, 15, 25, 0.95)");
             overlayGrad.addColorStop(0.4, "rgba(11, 15, 25, 0.4)");
@@ -155,7 +171,7 @@ async function generateAITicket(themePrompt, movieName, quantity) {
             ctx.fillStyle = overlayGrad;
             ctx.fillRect(0, 0, 800, 300);
 
-            // ПУНКТИР ОТРЫВА
+            // ПУНКТИР
             ctx.beginPath();
             ctx.setLineDash([8, 8]);
             ctx.moveTo(620, 20);
@@ -165,7 +181,7 @@ async function generateAITicket(themePrompt, movieName, quantity) {
             ctx.stroke();
             ctx.restore();
 
-            // ТЕНИ ДЛЯ ТЕКСТА
+            // ТЕНИ
             ctx.shadowColor = "rgba(0, 0, 0, 0.8)";
             ctx.shadowBlur = 6;
             ctx.shadowOffsetX = 2;
@@ -200,7 +216,7 @@ async function generateAITicket(themePrompt, movieName, quantity) {
             ctx.font = "500 12px 'Montserrat', sans-serif";
             ctx.fillText(`NO. ${i + 1}/${quantity}  |  ID: ${uniqueId}`, 45, 275);
 
-            // КОРЕШОК БИЛЕТА
+            // КОРЕШОК
             ctx.shadowColor = "transparent";
             ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
             for (let x = 655; x < 745; x += Math.random() * 4 + 2) {
@@ -222,12 +238,13 @@ async function generateAITicket(themePrompt, movieName, quantity) {
             downloadLink.href = canvas.toDataURL('image/png');
             downloadLink.click();
 
-            await new Promise(res => setTimeout(res, 600)); // Пауза между скачиваниями
+            await new Promise(res => setTimeout(res, 600));
         }
 
         if (window.showToast) window.showToast(`Успешно создано: ${quantity} шт.`, 'fa-check');
 
     } catch (error) {
+        console.error("Глобальная ошибка генерации:", error);
         if (window.showToast) window.showToast(`Произошла системная ошибка`, 'fa-xmark');
     }
 }

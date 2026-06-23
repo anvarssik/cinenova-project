@@ -11,7 +11,7 @@ async function syncMovies() {
         for (let page = 1; page <= 5; page++) {
             const API_URL = `https://kinopoiskapiunofficial.tech/api/v2.2/films?order=NUM_VOTE&type=FILM&yearFrom=2024&yearTo=2027&page=${page}`;
             
-            console.log(`📡 Загружаю страницу ${page}...`);
+            console.log(`Загружаю страницу ${page}...`);
             const response = await fetch(API_URL, {
                 method: 'GET',
                 headers: {
@@ -37,7 +37,7 @@ async function syncMovies() {
             db.serialize(() => {
                 db.run('DELETE FROM movies', (err) => {
                     if (err) console.error('Ошибка при очистке таблицы:', err.message);
-                    else console.log('🗑️ Таблица movies очищена от старых записей.');
+                    else console.log('Таблица movies очищена от старых записей.');
                 });
 
                 const stmt = db.prepare(`
