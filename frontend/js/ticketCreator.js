@@ -42,13 +42,17 @@ async function generateImagePromptWithGemini(userIdea) {
     const englishIdea = await translatePrompt(userIdea);
     const fallbackPrompt = "cinematic background, abstract dark shapes, beautiful lighting, 8k resolution, empty center";
 
-    if (!GEMINI_API_KEY || GEMINI_API_KEY === "ТВОЙ_КЛЮЧ_ЗДЕСЬ") {
-        return fallbackPrompt;
-    }
-
     try {
+        // Запрашиваем ключ здесь, так как именно эта функция делает запрос к Gemini
+        const configRes = await fetch('/api/config/keys');
+        const configData = await configRes.json();
+        const GEMINI_API_KEY = configData.geminiKey;
+
+        if (!GEMINI_API_KEY) {
+            return fallbackPrompt;
+        }
+
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-        // СТРОГОЕ УКАЗАНИЕ: Максимум 40 слов, одно предложение, никаких переносов строк.
         const systemPrompt = `You are an expert AI image prompt engineer. Create a highly detailed but CONCISE prompt (MAX 40 WORDS, ONE SINGLE SENTENCE) for an image generator based on this idea: "${englishIdea}". The image will be used as a background for a cinematic movie ticket. Focus on atmosphere, cinematic lighting, and style. NO text, NO letters, NO watermarks. DO NOT use line breaks or paragraphs. Return ONLY the prompt text.`;
 
         const response = await fetch(url, {
@@ -64,20 +68,18 @@ async function generateImagePromptWithGemini(userIdea) {
         const data = await response.json();
         let promptText = data.candidates[0].content.parts[0].text.trim();
 
-        // ОЧИСТКА: Удаляем любые случайные переносы строк (\n) и лишние пробелы, чтобы не ломать URL
+        // ОЧИСТКА: Удаляем любые случайные переносы строк (\n) и лишние пробелы
         promptText = promptText.replace(/\n|\r/g, ' ').replace(/\s+/g, ' ');
 
         return promptText;
 
     } catch (error) {
+        console.error("Ошибка генерации промпта:", error);
         return fallbackPrompt;
     }
 }
 
 async function generateAITicket(themePrompt, movieName, quantity) {
-    const configRes = await fetch('/api/config/keys');
-    const configData = await configRes.json();
-    const GEMINI_API_KEY = configData.geminiKey;
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
 
@@ -88,7 +90,6 @@ async function generateAITicket(themePrompt, movieName, quantity) {
     const detailedPrompt = await generateImagePromptWithGemini(themePrompt);
     const cacheBuster = Date.now();
 
-    // Для резервного абстрактного фона берем только первые 50 символов, чтобы не перегружать ссылку
     const shortSeed = encodeURIComponent(detailedPrompt.substring(0, 50));
 
     // 2. Бронебойный КАСКАД источников
@@ -121,7 +122,7 @@ async function generateAITicket(themePrompt, movieName, quantity) {
                 image.src = imgUrl;
             });
 
-            if (imageLoaded) break; // Успех! Выходим из цикла.
+            if (imageLoaded) break;
 
         } catch (e) {
             console.warn("Источник недоступен, переключаемся на резервный...");
