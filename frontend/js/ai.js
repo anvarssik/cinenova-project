@@ -3,10 +3,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatInput = document.getElementById('aiChatInput');
     const chatMessages = document.getElementById('aiChatMessagesBox');
 
-    const configRes = await fetch('/api/config/keys');
-    const configData = await configRes.json();
-    const GEMINI_API_KEY = configData.geminiKey;
-
     let currentKeyIndex = 0;
 
     if (!chatForm || !chatInput || !chatMessages) return;
@@ -14,29 +10,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const getUniqueId = () => 'msg-' + Date.now() + '-' + Math.floor(Math.random() * 10000);
 
     async function fetchWithFallback(systemPrompt) {
-        for (let i = currentKeyIndex; i < API_KEYS.length; i++) {
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEYS[i]}`;
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: systemPrompt }] }],
-                        generationConfig: { responseMimeType: "application/json" }
-                    })
-                });
+        const configRes = await fetch('/api/config/keys');
+        const configData = await configRes.json();
+        const apiKey = configData.geminiKey;
 
-                if (response.status === 429 || response.status === 403 || response.status === 400) {
-                    currentKeyIndex++;
-                    continue;
-                }
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
-                if (!response.ok) throw new Error("API Error");
-                return await response.json();
-            } catch (error) {
-                if (i === API_KEYS.length - 1) throw error;
-                currentKeyIndex++;
-            }
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: systemPrompt }] }],
+                    generationConfig: { responseMimeType: "application/json" }
+                })
+            });
+
+            if (!response.ok) throw new Error("API Error");
+            return await response.json();
+
+        } catch (error) {
+            console.error("Ошибка при запросе к ИИ:", error);
+            throw error;
         }
     }
 

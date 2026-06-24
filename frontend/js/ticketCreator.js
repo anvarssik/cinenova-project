@@ -1,7 +1,3 @@
-const configRes = await fetch('/api/config/keys');
-const configData = await configRes.json();
-const GEMINI_API_KEY = configData.geminiKey;
-
 document.addEventListener('DOMContentLoaded', () => {
     const ticketForm = document.getElementById('aiTicketForm');
 
@@ -79,6 +75,9 @@ async function generateImagePromptWithGemini(userIdea) {
 }
 
 async function generateAITicket(themePrompt, movieName, quantity) {
+    const configRes = await fetch('/api/config/keys');
+    const configData = await configRes.json();
+    const GEMINI_API_KEY = configData.geminiKey;
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
 
