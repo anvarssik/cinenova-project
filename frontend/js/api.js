@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function loadCinemas() {
-    const API_URL = 'http://localhost:3000/api/cinemas';
+    const API_URL = '/api/cinemas';
 
     try {
         const response = await fetch(API_URL);
@@ -29,7 +29,7 @@ async function loadCinemas() {
 }
 
 async function loadPremieres() {
-    const API_URL = 'http://localhost:3000/api/movies';
+    const API_URL = '/api/movies';
 
     try {
         const response = await fetch(API_URL);
@@ -200,7 +200,7 @@ function renderMovies(movies) {
 }
 
 async function loadMovieBuddies() {
-    const API_URL = 'http://localhost:3000/api/users';
+    const API_URL = '/api/users';
     try {
         const response = await fetch(API_URL);
         if (!response.ok) throw new Error('Ошибка при получении пользователей');

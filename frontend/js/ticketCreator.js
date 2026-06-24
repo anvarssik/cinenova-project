@@ -1,4 +1,6 @@
-const GEMINI_API_KEY = "YOUR_API_KEY_HERE";
+const configRes = await fetch('/api/config/keys');
+const configData = await configRes.json();
+const GEMINI_API_KEY = configData.geminiKey;
 
 document.addEventListener('DOMContentLoaded', () => {
     const ticketForm = document.getElementById('aiTicketForm');
@@ -65,10 +67,10 @@ async function generateImagePromptWithGemini(userIdea) {
 
         const data = await response.json();
         let promptText = data.candidates[0].content.parts[0].text.trim();
-        
+
         // ОЧИСТКА: Удаляем любые случайные переносы строк (\n) и лишние пробелы, чтобы не ломать URL
         promptText = promptText.replace(/\n|\r/g, ' ').replace(/\s+/g, ' ');
-        
+
         return promptText;
 
     } catch (error) {
@@ -104,27 +106,27 @@ async function generateAITicket(themePrompt, movieName, quantity) {
     for (const imgUrl of imageSources) {
         try {
             await new Promise((resolve, reject) => {
-                const timeout = setTimeout(() => reject(new Error("Timeout")), 15000); 
-                
+                const timeout = setTimeout(() => reject(new Error("Timeout")), 15000);
+
                 image.onload = () => {
                     clearTimeout(timeout);
                     imageLoaded = true;
                     resolve();
                 };
-                
+
                 image.onerror = () => {
                     clearTimeout(timeout);
                     reject(new Error("Load Error"));
                 };
-                
+
                 image.src = imgUrl;
             });
-            
+
             if (imageLoaded) break; // Успех! Выходим из цикла.
-            
+
         } catch (e) {
             console.warn("Источник недоступен, переключаемся на резервный...");
-            imageLoaded = false; 
+            imageLoaded = false;
         }
     }
 

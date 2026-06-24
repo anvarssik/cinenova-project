@@ -31,4 +31,8 @@ router.get('/users/:userId/achievements', userController.getUserAchievements);
 router.post('/tickets/buy', ticketController.buyTickets);
 router.get('/tickets/:userId', ticketController.getMyTickets);
 
+router.get('/config/keys', (req, res) => {
+    res.json({ geminiKey: process.env.GEMINI_API_KEY });
+});
+
 module.exports = router;

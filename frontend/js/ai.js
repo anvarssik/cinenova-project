@@ -3,7 +3,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const chatInput = document.getElementById('aiChatInput');
     const chatMessages = document.getElementById('aiChatMessagesBox');
 
-    const GEMINI_API_KEY = "YOUR_API_KEY_HERE";
+    const configRes = await fetch('/api/config/keys');
+    const configData = await configRes.json();
+    const GEMINI_API_KEY = configData.geminiKey;
 
     let currentKeyIndex = 0;
 
